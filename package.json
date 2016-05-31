@@ -1,0 +1,25 @@
+{
+  "name": "coreducks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0"
+  },
+  "scripts": {
+    "build": "babel src -d public/js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrroman/coreducks.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrroman/coreducks/issues"
+  },
+  "homepage": "https://github.com/mrroman/coreducks#readme"
+}
