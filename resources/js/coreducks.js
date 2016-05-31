@@ -17,22 +17,27 @@ function mount(originId, f, props = {}) {
 }
 
 function fragment(...es) {
-    console.log(`create fragment with ${es}`);
+//    console.log(`create fragment with ${es}`);
     let frag = document.createDocumentFragment();
     es.forEach((e) => frag.appendChild(e));
     return frag;
 }
 
 function el(name, attrs = {}, ...es) {
-    console.log(`create element <${name}> with attrs ${attrs}`);
+//    console.log(`create element <${name}> with attrs ${attrs}`);
     var element = document.createElement(name);
     Object.keys(attrs).forEach((attrName) => element.setAttribute(attrName, attrs[attrName]));
     es.forEach((e) => element.appendChild(e));
     return element;
 }
 
+function listen(e, type, listener) {
+    e.addEventListener(type, listener);
+    return e;
+}
+
 function text(s) {
-    console.log(`create text node with text ${s}`);
+//    console.log(`create text node with text ${s}`);
     return document.createTextNode(s);
 }
 
