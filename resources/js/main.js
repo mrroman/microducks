@@ -20,12 +20,13 @@ let todoItem = (item) => {
                             text('Delete')));
 };
 
-let todoList = (props) => {
-    return fragment(el('ul', {},
-                       ...props.tasks.map(todoItem)))(props);
+let todoList = (tasks) => {
+    return fragment(el('ul', {}, ...tasks.map(todoItem)));
 };
 
-let todos = mount('main', fragment(todoList), store.data);
+let todos = mount('main', (props) => {
+    return fragment(todoList(props.tasks));
+}, store.data);
 
 store.handle('add-item', function (data) {
     data.tasks.push({id: 3, text: 'Other task', done: false});

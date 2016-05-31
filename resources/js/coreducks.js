@@ -16,30 +16,24 @@ function mount(originId, f, props = {}) {
     };
 }
 
-function fragment(...fs) {
-    return (props) => {
-        console.log(`create fragment with ${fs}`);
-        let frag = document.createDocumentFragment();
-        fs.forEach((f) => frag.appendChild(f(props)));
-        return frag;
-    };
+function fragment(...es) {
+    console.log(`create fragment with ${es}`);
+    let frag = document.createDocumentFragment();
+    es.forEach((e) => frag.appendChild(e));
+    return frag;
 }
 
-function el(name, attrs = {}, ...fs) {
-    return (props) => {
-        console.log(`create element <${name}> with attrs ${attrs}`);
-        var element = document.createElement(name);
-        Object.keys(attrs).forEach((attrName) => element.setAttribute(attrName, attrs[attrName]));
-        fs.forEach((f) => element.appendChild(f(props)));
-        return element;
-    };
+function el(name, attrs = {}, ...es) {
+    console.log(`create element <${name}> with attrs ${attrs}`);
+    var element = document.createElement(name);
+    Object.keys(attrs).forEach((attrName) => element.setAttribute(attrName, attrs[attrName]));
+    es.forEach((e) => element.appendChild(e));
+    return element;
 }
 
 function text(s) {
-    return (props) => {
-        console.log(`create text node with text ${s}`);
-        return document.createTextNode(s);
-    };
+    console.log(`create text node with text ${s}`);
+    return document.createTextNode(s);
 }
 
 // stores
