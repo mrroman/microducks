@@ -10,29 +10,34 @@ function mount(originId, f, props = {}) {
     }
 
     origin.appendChild(f(props));
-    return (props) => {
+    return () => {
         clearOrigin();
         origin.appendChild(f(props));
     };
 }
 
 function fragment(...fs) {
-    let frag = document.createDocumentFragment();
-    fs.forEach((f) => frag.appendChild(f()));
-    return frag;
+    return (props) => {
+        console.log(`create fragment with ${fs}`);
+        let frag = document.createDocumentFragment();
+        fs.forEach((f) => frag.appendChild(f(props)));
+        return frag;
+    };
 }
 
 function el(name, attrs = {}, ...fs) {
-    return () => {
+    return (props) => {
+        console.log(`create element <${name}> with attrs ${attrs}`);
         var element = document.createElement(name);
         Object.keys(attrs).forEach((attrName) => element.setAttribute(attrName, attrs[attrName]));
-        fs.forEach((f) => element.appendChild(f()));
+        fs.forEach((f) => element.appendChild(f(props)));
         return element;
     };
 }
 
 function text(s) {
-    return () => {
+    return (props) => {
+        console.log(`create text node with text ${s}`);
         return document.createTextNode(s);
     };
 }
