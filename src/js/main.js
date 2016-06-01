@@ -17,7 +17,7 @@ let store = createStore({
 let todoItem = (item) => {
     return el('li', {},
               text(item.text),
-              listen(el('button', {}, text('Delete')), 'click', () => { store.dispatch("remove-item", item.id); }));
+              listen(el('button', {}, text('Delete')), 'click', () => { store.dispatch('remove-item', item.id); }));
 };
 
 let todoList = (tasks) => {
