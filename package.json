@@ -1,25 +1,29 @@
 {
-  "name": "coreducks",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {
-    "babel-cli": "^6.9.0",
-    "babel-preset-es2015": "^6.9.0"
-  },
-  "scripts": {
-    "build": "babel src -d public/js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mrroman/coreducks.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mrroman/coreducks/issues"
-  },
-  "homepage": "https://github.com/mrroman/coreducks#readme"
+    "name": "coreducks",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "dependencies": {},
+    "devDependencies": {
+        "babel-cli": "^6.9.0",
+        "babel-preset-es2015": "^6.9.0",
+        "npm-run-parallel": "^0.4.3",
+        "node-static": "0.7.7"
+    },
+    "scripts": {
+        "build": "babel src/js -d public/js",
+        "start": "npm-run-parallel build server",
+        "server": "static public -p 3000 -a 0.0.0.0",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mrroman/coreducks.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/mrroman/coreducks/issues"
+    },
+    "homepage": "https://github.com/mrroman/coreducks#readme"
 }
