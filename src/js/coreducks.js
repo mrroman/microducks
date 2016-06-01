@@ -1,7 +1,7 @@
 // virtual dom
 
 function mount(originId, f, props = {}) {
-    let origin = document.getElementById(originId);
+    const origin = document.getElementById(originId);
 
     function clearOrigin() {
         while (origin.firstChild) {
@@ -17,15 +17,13 @@ function mount(originId, f, props = {}) {
 }
 
 function fragment(...es) {
-//    console.log(`create fragment with ${es}`);
-    let frag = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     es.forEach((e) => frag.appendChild(e));
     return frag;
 }
 
 function el(name, attrs = {}, ...es) {
-//    console.log(`create element <${name}> with attrs ${attrs}`);
-    var element = document.createElement(name);
+    const element = document.createElement(name);
     Object.keys(attrs).forEach((attrName) => element.setAttribute(attrName, attrs[attrName]));
     es.forEach((e) => element.appendChild(e));
     return element;
@@ -37,14 +35,13 @@ function listen(e, type, listener) {
 }
 
 function text(s) {
-//    console.log(`create text node with text ${s}`);
     return document.createTextNode(s);
 }
 
 // stores
 
 function createStore(initialData) {
-    let ev = document.createDocumentFragment();
+    const ev = document.createDocumentFragment();
     ev.data = initialData || {};
 
     ev.handle = (eventType, handler) => {
