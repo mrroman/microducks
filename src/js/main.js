@@ -1,4 +1,6 @@
 let store = createStore({
+    taskName: '',
+    nextId: 3,
     tasks: [
         {
             id: 1,
@@ -14,22 +16,30 @@ let store = createStore({
     clock: ''
 });
 
+let todoAdd = (taskName) => {
+    return el('input', {'id': 'aaa',
+                        'type': 'text',
+                        'value': taskName,
+                        'oninput': 'store.dispatch("update-task-name", this.value)'});
+};
+
 let todoItem = (item) => {
     return el('li', {},
               text(item.text),
-              listen(el('button', {}, text('Delete')), 'click', () => { store.dispatch('remove-item', item.id); }));
+              el('button', {onclick: 'store.dispatch("remove-item", ' + item.id + ')'}, text('Delete')));
 };
 
 let todoList = (tasks) => {
-    return fragment(el('ul', {}, ...tasks.map(todoItem)));
+    return el('ul', {}, ...tasks.map(todoItem));
 };
 
 let todos = mount('main', (props) => {
-    return fragment(todoList(props.tasks), text(props.clock));
+    return el('div', {}, todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
 }, store.data);
 
 store.handle('add-item', function (data) {
-    data.tasks.push({id: 3, text: 'Other task', done: false});
+    data.tasks.push({id: data.nextId, text: data.taskName, done: false});
+    data.nextId++;
     return data;
 });
 
@@ -40,6 +50,11 @@ store.handle('remove-item', function(data, itemId) {
 
 store.handle('refresh-clock', function(data) {
     data.clock = new Date().toUTCString();
+    return data;
+});
+
+store.handle('update-task-name', function(data, taskName) {
+    data.taskName = taskName;
     return data;
 });
 
