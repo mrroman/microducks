@@ -11,7 +11,7 @@
         "node-static": "0.7.7"
     },
     "scripts": {
-        "build": "babel src/js -d public/js",
+        "build": "babel -w src/js -d public/js",
         "start": "npm-run-parallel build server",
         "server": "static public -p 3000 -a 0.0.0.0",
         "test": "echo \"Error: no test specified\" && exit 1"
