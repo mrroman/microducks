@@ -195,3 +195,11 @@ function cache(f) {
         return lastResult;
     };
 }
+
+export {
+    mount,
+    el,
+    text,
+    createStore,
+    cache
+};
