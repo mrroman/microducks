@@ -17,24 +17,26 @@ let store = createStore({
 });
 
 let todoAdd = (taskName) => {
-    return el('input', {'id': 'aaa',
-                        'type': 'text',
-                        'value': taskName,
-                        'oninput': 'store.dispatch("update-task-name", this.value)'});
+    return el('input').
+        attr('type', 'text').
+        attr('value', taskName).
+        on('input', (e) => store.dispatch("update-task-name", e.target.value));
 };
 
 let todoItem = (item) => {
-    return el('li', {},
-              text(item.text),
-              el('button', {onclick: 'store.dispatch("remove-item", ' + item.id + ')'}, text('Delete')));
+    return el('li').
+        body(text(item.text),
+             el('button').
+             on('click', (e) => store.dispatch("remove-item", item.id)).
+             body(text('Delete')));
 };
 
 let todoList = (tasks) => {
-    return el('ul', {}, ...tasks.map(todoItem));
+    return el('ul').body(...tasks.map(todoItem));
 };
 
 let todos = mount('main', (props) => {
-    return el('div', {}, todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
+    return el('div').body(todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
 }, store.data);
 
 store.handle('add-item', function (data) {
