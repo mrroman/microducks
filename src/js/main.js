@@ -16,12 +16,12 @@ let store = createStore({
     clock: ''
 });
 
-let todoAdd = (taskName) => {
+let todoAdd = cache(function todoAdd(taskName) {
     return el('input').
         attr('type', 'text').
         attr('value', taskName).
         on('input', (e) => store.dispatch("update-task-name", e.target.value));
-};
+});
 
 let todoItem = (item) => {
     return el('li').
@@ -31,16 +31,16 @@ let todoItem = (item) => {
              body(text('Delete')));
 };
 
-let todoList = (tasks) => {
+let todoList = cache(function todoList(tasks) {
     return el('ul').body(...tasks.map(todoItem));
-};
+});
 
 let todos = mount('main', (props) => {
     return el('div').body(todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
 }, store.data);
 
 store.handle('add-item', function (data) {
-    data.tasks.push({id: data.nextId, text: data.taskName, done: false});
+    data.tasks= [{id: data.nextId, text: data.taskName, done: false}, ...data.tasks];
     data.nextId++;
     return data;
 });

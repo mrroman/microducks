@@ -83,7 +83,6 @@ function mount(originId, f, props = {}) {
         function mergeTag() {
             if (element.nodeType !== Node.ELEMENT_NODE || element.nodeName.toLowerCase() !== view.name.toLowerCase()) {
                 let newElement = createNode(view);
-                console.log('new element', view, element.nodeName, element.wholeText);
                 element.parentNode.replaceChild(newElement, element);
                 element = newElement;
             }
@@ -179,4 +178,20 @@ function createStore(initialData) {
         ev.dispatchEvent(event);
     };
     return ev;
+}
+
+// utils
+
+function cache(f) {
+    let lastProps = null,
+        lastResult = null;
+
+    return (props) => {
+        if (props !== lastProps) {
+            lastProps = props;
+            lastResult = f(props);
+        }
+
+        return lastResult;
+    };
 }
