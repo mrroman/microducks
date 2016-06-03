@@ -1,44 +1,63 @@
 import * as CoreDucks from 'coreducks.js';
 import {el, text} from 'coreducks.js';
 
-let store = CoreDucks.createStore({
+const store = CoreDucks.createStore({
     taskName: '',
-    nextId: 3,
-    tasks: [
-        {
-            id: 1,
-            text: 'Important task',
-            done: false
-        },
-        {
-            id: 2,
-            text: 'Important task 2',
-            done: true
-        }
-    ],
-    clock: ''
+    nextId: 1,
+    tasks: []
 });
 
-let todoAdd = CoreDucks.cache(function todoAdd(taskName) {
-    return el('input').
-        attr('type', 'text').
-        attr('value', taskName).
-        on('input', (e) => store.dispatch("update-task-name", e.target.value));
+const todoAdd = CoreDucks.cache(function todoAdd(taskName) {
+    return el('input')
+        .attr('class', 'new-todo')
+        .attr('placeholder', 'What needs to be done?')
+        .attr('autofocus', 'true')
+        .attr('type', 'text')
+        .attr('value', taskName)
+        .on('input', (e) => store.dispatch("update-task-name", e.target.value))
+        .on('change', (e) => store.dispatch('add-item'));
 });
 
-let todoItem = (item) => {
-    return el('li').
-        body(text(item.text),
-             el('button').on('click', (e) => store.dispatch("remove-item", item.id)).
-             body(text('Delete')));
+const todoItem = (item) => {
+    return el('li')
+        .body(el('div').attr('class', 'view')
+              .body(el('input').attr('class', 'toggle').attr('type', 'checkbox'),
+                    el('label').body(text(item.text)),
+                    el('button').attr('class', 'destroy').on('click', (e) => store.dispatch("remove-item", item.id))));
 };
 
-let todoList = CoreDucks.cache(function todoList(tasks) {
-    return el('ul').body(...tasks.map(todoItem));
+const todoFilter = (type) => {
+    return el('li').body(el('a').attr('class', 'selected').body(text(type)));
+};
+
+const todoFooter = CoreDucks.cache((tasks) => {
+    return el('footer').attr('class', 'footer')
+        .body(el('span').attr('class', 'todo-count')
+              .body(el('strong').body(text(tasks.length)),
+                    text(' left')),
+              el('ul').attr('class', 'filters')
+              .body(todoFilter('All'), todoFilter('Active'), todoFilter('Completed')));
 });
 
-let todos = CoreDucks.mount('main', (props) => {
-    return el('div').body(todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
+const todoList = CoreDucks.cache(function todoList(tasks) {
+    if (tasks.length) {
+        return el('section').attr('class', 'main')
+            .body(el('ul')
+                  .attr('class', 'todo-list')
+                  .body(...tasks.map(todoItem)));
+    } else {
+        return el('div');
+    }
+});
+
+const todos = CoreDucks.mount('todoapp', (props) => {
+    return el('div')
+        .body(el('header')
+              .attr('class', 'header')
+              .body(el('h1').body(text('todos')),
+                    todoAdd(props.taskName)),
+              todoList(props.tasks),
+              todoFooter(props.tasks));
 }, store.data);
 
 store.handle('add-item', function (data) {
@@ -52,11 +71,6 @@ store.handle('remove-item', function(data, itemId) {
     return data;
 });
 
-store.handle('refresh-clock', function(data) {
-    data.clock = new Date().toUTCString();
-    return data;
-});
-
 store.handle('update-task-name', function(data, taskName) {
     data.taskName = taskName;
     return data;
@@ -65,5 +79,3 @@ store.handle('update-task-name', function(data, taskName) {
 store.subscribe(function(data) {
     todos(data);
 });
-
-setInterval(() => store.dispatch('refresh-clock'), 1000);
