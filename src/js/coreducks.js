@@ -57,7 +57,7 @@ function mount(originId, f, props = {}) {
 
     function mergeListeners(element, view) {
         merge(element.$$coreducks.listeners, view.listeners,
-              EventTarget.prototype.addEventListener.bind(element), EventTarget.prototype.removeEventListener.bind(element));
+              Element.prototype.addEventListener.bind(element), Element.prototype.removeEventListener.bind(element));
     }
 
     function mergeBody(element, view) {
