@@ -60,6 +60,24 @@ function mount(originId, f, props = {}) {
               EventTarget.prototype.addEventListener.bind(element), EventTarget.prototype.removeEventListener.bind(element));
     }
 
+    function mergeBody(element, view) {
+        if (element.childNodes.length < view.body.length) {
+            for (let i = element.childNodes.length; i < view.body.length; i++) {
+                element.appendChild(createNode(view.body[i]));
+            }
+        } else if (element.childNodes.length > view.body.length) {
+            let toRemove = [];
+            for (let i = view.body.length; i < element.childNodes.length; i++) {
+                toRemove.push(element.childNodes.item(i));
+            }
+            toRemove.forEach((node) => element.removeChild(node));
+        }
+
+        for (var i = 0; i < view.body.length; i++) {
+            mergeWithDOM(element.childNodes.item(i), view.body[i]);
+        }
+    }
+
     function mergeWithDOM(element, view) {
         // create new element if old doesn't match
         function mergeTag() {
@@ -72,23 +90,7 @@ function mount(originId, f, props = {}) {
 
             mergeAttributes(element, view);
             mergeListeners(element, view);
-
-            if (element.childNodes.length < view.body.length) {
-                for (let i = element.childNodes.length; i < view.body.length; i++) {
-                    element.appendChild(createNode(view.body[i]));
-                }
-            } else if (element.childNodes.length > view.body.length) {
-                let toRemove = [];
-                for (let i = view.body.length; i < element.childNodes.length; i++) {
-                    toRemove.push(element.childNodes.item(i));
-                }
-                toRemove.forEach((node) => element.removeChild(node));
-            }
-
-            for (var i = 0; i < view.body.length; i++) {
-                mergeWithDOM(element.childNodes.item(i), view.body[i]);
-            }
-
+            mergeBody(element, view);
             return element;
         }
 
