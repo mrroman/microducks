@@ -21,50 +21,43 @@ function mount(originId, f, props = {}) {
     function addMetadata(element) {
         if (!element.$$coreducks) {
             element.$$coreducks = {
-                listeners: {}
+                listeners: {},
+                attrs: {}
             };
         }
     }
 
-    function mergeAttributes(element, view) {
-        let attrsToRemove = [];
-        for (let i = 0; i < element.attributes.length; i++) {
-            let nodeName = element.attributes[i].nodeName;
-            if (!(nodeName in view.attrs)) {
-                attrsToRemove.push(nodeName);
-            }
+    function merge(elementPart, viewPart, addFunc, removeFunc) {
+        let names = Object.keys(viewPart),
+            toRemove = names.filter((name) => {
+                return (name in elementPart) && elementPart[name] !== viewPart[name];
+            }),
+            toAdd = names.filter((name) => {
+                return !(name in elementPart) || elementPart[name] !== viewPart[name];
+            });
+
+        if (toAdd.length === 0 && toRemove.length === 0) {
+            return;
         }
 
-        attrsToRemove.forEach((attr) => element.attributes.removeNamedItem(attr));
-        view.attrs && Object.keys(view.attrs).forEach((attr) => {
-            element.setAttribute(attr, view.attrs[attr]);
+        toRemove.forEach((name) => {
+            removeFunc(name, elementPart[name]);
+            delete elementPart[name];
+        });
+        toAdd.forEach((name) => {
+            addFunc(name, viewPart[name]);
+            elementPart[name] = viewPart[name];
         });
     }
 
+    function mergeAttributes(element, view) {
+        merge(element.$$coreducks.attrs, view.attrs,
+              Element.prototype.setAttribute.bind(element), Element.prototype.removeAttribute.bind(element));
+    }
+
     function mergeListeners(element, view) {
-        let viewListeners = view.listeners,
-            eventNames = Object.keys(viewListeners),
-            elementListeners = element.$$coreducks.listeners;
-
-        let listenersToRemove = eventNames.filter((name) => {
-            return (name in elementListeners) && elementListeners[name] !== viewListeners[name];
-        });
-
-        let listenersToAdd = eventNames.filter((name) => {
-            return !(name in elementListeners) || elementListeners[name] !== viewListeners[name];
-        });
-
-        if (listenersToAdd.length === 0 && listenersToRemove.length === 0)
-            return;
-
-        listenersToRemove.forEach((name) => {
-            element.removeEventListener(name, elementListeners[name]);
-            delete elementListeners[name];
-        });
-        listenersToAdd.forEach((name) => {
-            element.addEventListener(name, viewListeners[name]);
-            elementListeners[name] = viewListeners[name];
-        });
+        merge(element.$$coreducks.listeners, view.listeners,
+              EventTarget.prototype.addEventListener.bind(element), EventTarget.prototype.removeEventListener.bind(element));
     }
 
     function mergeWithDOM(element, view) {
@@ -108,7 +101,6 @@ function mount(originId, f, props = {}) {
             return element;
         }
 
-        console.log('Merging', view);
         switch(view.type) {
         case 'tag':
             return mergeTag();
