@@ -1,4 +1,7 @@
-let store = createStore({
+import * as CoreDucks from 'coreducks.js';
+import {el, text} from 'coreducks.js';
+
+let store = CoreDucks.createStore({
     taskName: '',
     nextId: 3,
     tasks: [
@@ -16,7 +19,7 @@ let store = createStore({
     clock: ''
 });
 
-let todoAdd = cache(function todoAdd(taskName) {
+let todoAdd = CoreDucks.cache(function todoAdd(taskName) {
     return el('input').
         attr('type', 'text').
         attr('value', taskName).
@@ -26,16 +29,15 @@ let todoAdd = cache(function todoAdd(taskName) {
 let todoItem = (item) => {
     return el('li').
         body(text(item.text),
-             el('button').
-             on('click', (e) => store.dispatch("remove-item", item.id)).
+             el('button').on('click', (e) => store.dispatch("remove-item", item.id)).
              body(text('Delete')));
 };
 
-let todoList = cache(function todoList(tasks) {
+let todoList = CoreDucks.cache(function todoList(tasks) {
     return el('ul').body(...tasks.map(todoItem));
 });
 
-let todos = mount('main', (props) => {
+let todos = CoreDucks.mount('main', (props) => {
     return el('div').body(todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
 }, store.data);
 
