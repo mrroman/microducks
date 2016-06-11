@@ -1,8 +1,8 @@
 {
-    "name": "coreducks",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
+    "name": "microducks",
+    "version": "0.0.1",
+    "description": "Microframework for functional Web development",
+    "main": "build/microducks.js",
     "dependencies": {},
     "devDependencies": {
         "babel-cli": "^6.9.0",
@@ -20,12 +20,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mrroman/coreducks.git"
+        "url": "git+https://github.com/mrroman/microducks.git"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/mrroman/coreducks/issues"
+        "url": "https://github.com/mrroman/microducks/issues"
     },
-    "homepage": "https://github.com/mrroman/coreducks#readme"
+    "homepage": "https://github.com/mrroman/microducks#readme"
 }
