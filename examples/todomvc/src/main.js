@@ -1,3 +1,5 @@
+import 'todomvc-app-css/index.css';
+import 'todomvc-common/base.css';
 import * as MicroDucks from 'microducks';
 import {el, text} from 'microducks';
 

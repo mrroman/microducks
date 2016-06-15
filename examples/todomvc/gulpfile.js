@@ -2,7 +2,7 @@ const gulp = require('gulp'),
       webpack = require('gulp-webpack'),
       connect = require('gulp-connect');
 
-gulp.task('build', () => {
+gulp.task('build:js', () => {
     gulp.src('src/*.js')
         .pipe(webpack(require('./webpack.config.js')))
         .pipe(gulp.dest('public/js'))
@@ -10,7 +10,7 @@ gulp.task('build', () => {
 });
 
 gulp.task('watch', () => {
-    gulp.watch('src/*.js', ['build']);
+    gulp.watch('src/*.js', ['build:js']);
 });
 
 gulp.task('serve', () => {
@@ -20,4 +20,4 @@ gulp.task('serve', () => {
     });
 });
 
-gulp.task('default', ['serve', 'watch']);
+gulp.task('default', ['build:js', 'serve', 'watch']);
