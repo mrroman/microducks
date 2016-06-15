@@ -1,7 +1,7 @@
-import * as CoreDucks from 'coreducks.js';
-import {el, text} from 'coreducks.js';
+import * as MicroDucks from 'microducks';
+import {el, text} from 'microducks';
 
-let store = CoreDucks.createStore({
+let store = MicroDucks.createStore({
     taskName: '',
     nextId: 3,
     tasks: [
@@ -12,14 +12,14 @@ let store = CoreDucks.createStore({
         },
         {
             id: 2,
-            text: 'Important task 2',
+            text: 'Important task 1',
             done: true
         }
     ],
     clock: ''
 });
 
-let todoAdd = CoreDucks.cache(function todoAdd(taskName) {
+let todoAdd = MicroDucks.cache(function todoAdd(taskName) {
     return el('input').
         attr('type', 'text').
         attr('value', taskName).
@@ -33,11 +33,11 @@ let todoItem = (item) => {
              body(text('Delete')));
 };
 
-let todoList = CoreDucks.cache(function todoList(tasks) {
+let todoList = MicroDucks.cache(function todoList(tasks) {
     return el('ul').body(...tasks.map(todoItem));
 });
 
-let todos = CoreDucks.mount('main', (props) => {
+let todos = MicroDucks.mount('main', (props) => {
     return el('div').body(todoAdd(props.taskName), todoList(props.tasks), text(props.clock));
 }, store.data);
 
