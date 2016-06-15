@@ -3,3 +3,4 @@ node_modules
 public/js
 .tern-port
 *.sublime*
+dist/
