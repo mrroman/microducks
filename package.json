@@ -1,29 +1,31 @@
 {
-    "name": "microducks",
-    "version": "0.0.1",
-    "description": "Microframework for functional Web development",
-    "main": "./dist/microducks.js",
-    "dependencies": {},
-    "devDependencies": {
-        "babel-plugin-transform-es2015-modules-umd": "^6.8.0",
-        "babel-preset-es2015": "^6.9.0",
-        "gulp": "^3.9.1",
-        "gulp-babel": "^6.1.2",
-        "gulp-concat": "^2.6.0"
-    },
-    "scripts": {
-        "dev": "gulp dev",
-        "build": "gulp build",
-        "test": "gulp test"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/mrroman/microducks.git"
-    },
-    "author": "Konrad Mrożek",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/mrroman/microducks/issues"
-    },
-    "homepage": "https://github.com/mrroman/microducks#readme"
+  "name": "microducks",
+  "version": "0.0.1",
+  "description": "Microframework for functional Web development",
+  "main": "./dist/microducks.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-plugin-transform-es2015-modules-umd": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-mocha": "^2.2.0"
+  },
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp build",
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrroman/microducks.git"
+  },
+  "author": "Konrad Mrożek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrroman/microducks/issues"
+  },
+  "homepage": "https://github.com/mrroman/microducks#readme"
 }

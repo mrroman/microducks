@@ -183,13 +183,13 @@ function createStore(initialData) {
 // utils
 
 function cache(f) {
-    let lastProps = null,
+    let lastArgs = null,
         lastResult = null;
 
-    return (props) => {
-        if (props !== lastProps) {
-            lastProps = props;
-            lastResult = f(props);
+    return (...args) => {
+        if (!lastArgs || !args.every((v,i) => lastArgs[i] === v)) {
+            lastArgs = args;
+            lastResult = f.apply(this, args);
         }
 
         return lastResult;
