@@ -5,3 +5,4 @@ public/js
 examples/*/public/js
 .tern-port
 *.sublime*
+dist/
