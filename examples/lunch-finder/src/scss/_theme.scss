@@ -1,0 +1,38 @@
+body {
+    background: $bg-color;
+    color: $font-main-color;
+    font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    line-height: 1.4em;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+}
+
+.header {
+    text-align: center;
+
+    .header__title {
+        margin: 2rem 3rem;
+        font-size: 3rem;
+        font-weight: 300;
+        line-height: 1em;
+    }
+}
+
+.alert {
+    padding: 1rem;
+    background: $color-white-06;
+}
+
+
+.text-muted {
+    margin: 65px auto 0;
+    color: $color-grey-2;
+    font-size: 10px;
+    text-align: center;
+    text-shadow: 0 1px 0 $color-white-06;
+
+}
