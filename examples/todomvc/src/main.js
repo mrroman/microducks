@@ -3,13 +3,13 @@ import 'todomvc-common/base.css';
 import * as MicroDucks from 'microducks';
 import {el, text} from 'microducks';
 
-const store = MicroDucks.createStore({
+const store = MicroDucks.Store.create({
     taskName: '',
     nextId: 1,
     tasks: []
 });
 
-const todoAdd = MicroDucks.cache(function todoAdd(taskName) {
+const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
     return el('input')
         .attr('class', 'new-todo')
         .attr('placeholder', 'What needs to be done?')
@@ -32,7 +32,7 @@ const todoFilter = (type) => {
     return el('li').body(el('a').attr('class', 'selected').body(text(type)));
 };
 
-const todoFooter = MicroDucks.cache((tasks) => {
+const todoFooter = MicroDucks.Utils.cache((tasks) => {
     return el('footer').attr('class', 'footer')
         .body(el('span').attr('class', 'todo-count')
               .body(el('strong').body(text(tasks.length)),
@@ -41,7 +41,7 @@ const todoFooter = MicroDucks.cache((tasks) => {
               .body(todoFilter('All'), todoFilter('Active'), todoFilter('Completed')));
 });
 
-const todoList = MicroDucks.cache(function todoList(tasks) {
+const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
     if (tasks.length) {
         return el('section').attr('class', 'main')
             .body(el('ul')

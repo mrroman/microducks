@@ -5,7 +5,7 @@ import lunchFinderService from './lunch-finder.service';
 import mockedPlace from './mocked/place.json';
 
 
-const store = MicroDucks.createStore({
+const store = MicroDucks.Store.create({
     place: mockedPlace
 });
 
@@ -38,7 +38,7 @@ const buttonElement = () => {
         );
 };
 
-const placeElement = MicroDucks.cache((item) => {
+const placeElement = MicroDucks.Utils.cache((item) => {
     return el('section')
         .attr('class', 'feed clearfix')
         .body(
