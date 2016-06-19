@@ -9,17 +9,8 @@ function createNode(view) {
         element = document.createTextNode(view.text);
     }
 
-    addMetadata(element);
+    element.$$view = {};
     return element;
-}
-
-function addMetadata(element) {
-    if (!element.$$coreducks) {
-        element.$$coreducks = {
-            listeners: {},
-            attrs: {}
-        };
-    }
 }
 
 function View(type) {

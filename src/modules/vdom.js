@@ -4,12 +4,14 @@ function mount(originId, f, props = {}) {
     let origin = document.getElementById(originId);
 
     function mergeAttributes(element, view) {
-        Utils.merge(element.$$coreducks.attrs, view.attrs,
+        element.$$view.attrs = element.$$view.attrs || {};
+        Utils.merge(element.$$view.attrs, view.attrs,
               Element.prototype.setAttribute.bind(element), Element.prototype.removeAttribute.bind(element));
     }
 
     function mergeListeners(element, view) {
-        Utils.merge(element.$$coreducks.listeners, view.listeners,
+        element.$$view.listeners = element.$$view.listeners || {};
+        Utils.merge(element.$$view.listeners, view.listeners,
                     (name, next, prev) => {
                         element.removeEventListener(name, prev);
                         element.addEventListener(name, next);
@@ -44,9 +46,14 @@ function mount(originId, f, props = {}) {
                 element = newElement;
             }
 
-            mergeAttributes(element, view);
-            mergeListeners(element, view);
-            mergeBody(element, view);
+            if (element.$$view !== view) {
+                mergeAttributes(element, view);
+                mergeListeners(element, view);
+                mergeBody(element, view);
+
+                element.$$view = view;
+            }
+
             return element;
         }
 
@@ -56,6 +63,8 @@ function mount(originId, f, props = {}) {
                 element.parentNode.replaceChild(newElement, element);
                 element = newElement;
             }
+
+            element.$$view = view;
             return element;
         }
 
@@ -69,7 +78,7 @@ function mount(originId, f, props = {}) {
         }
     }
 
-    addMetadata(origin);
+    origin.$$view = {};
     origin = mergeWithDOM(origin, f(props));
     return () => {
         origin = mergeWithDOM(origin, f(props));
