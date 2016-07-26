@@ -1,7 +1,7 @@
 const gulp = require('gulp'),
       babel = require('gulp-babel'),
       concat = require('gulp-concat'),
-      mocha = require('gulp-mocha'),
+      mocha = require('gulp-mocha-phantomjs'),
       del = require('del');
 
 gulp.task('clean:dist', (cb) => {
@@ -26,7 +26,7 @@ gulp.task('build:test', ['clean:test'], () => {
 });
 
 gulp.task('test', ['build:src', 'build:test'], () => {
-    return gulp.src('test-build/*.js')
+    return gulp.src('test/runner.html')
         .pipe(mocha({reporter:'spec'}))
         .on('error', (e) => {
             console.log('[mocha]', e.message);
