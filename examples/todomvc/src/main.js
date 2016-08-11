@@ -22,8 +22,9 @@ const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
 
 const todoItem = (item) => {
     return el('li')
+        .prop('className', item.done ? 'completed' : '')
         .body(el('div').prop('className', 'view')
-              .body(el('input').prop('className', 'toggle').prop('type', 'checkbox'),
+              .body(el('input').prop('className', 'toggle').prop('type', 'checkbox').prop('checked', item.done).on('change', (e) => { store.dispatch("check-item", item.id);}),
                     el('label').body(text(item.text)),
                     el('button').prop('className', 'destroy').on('click', (e) => store.dispatch("remove-item", item.id))));
 };
@@ -63,8 +64,11 @@ const todos = MicroDucks.mount('todoapp', (props) => {
 }, store.data);
 
 store.handle('add-item', function (data) {
-    data.tasks= [{id: data.nextId, text: data.taskName, done: false}, ...data.tasks];
-    data.nextId++;
+    if (data.taskName !== '') {
+        data.tasks= [{id: data.nextId, text: data.taskName, done: false}, ...data.tasks];
+        data.taskName = '';
+        data.nextId++;
+    }
     return data;
 });
 
@@ -77,6 +81,21 @@ store.handle('update-task-name', function(data, taskName) {
     data.taskName = taskName;
     return data;
 });
+
+store.handle('check-item', function(data, itemId) {
+    data.tasks = data.tasks.map((item) => {
+        if (item.id === itemId) {
+            return {
+                id: item.id,
+                text: item.text,
+                done: !item.done
+            };
+        } else {
+            return item;
+        }
+    });
+    return data;
+})
 
 store.subscribe(function(data) {
     todos(data);
