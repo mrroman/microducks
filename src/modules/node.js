@@ -19,7 +19,6 @@ El.prototype = {
         return this;
     },
     node() {
-        console.log('Create element', this.name);
         const element = document.createElement(this.name);
         element.$$view = {};
         return element;
@@ -37,7 +36,6 @@ function Text(s) {
 
 Text.prototype = {
     node() {
-        console.log('Create text', this.text);
         let element = document.createTextNode(this.text);
         element.$$view = {};
         return element;
