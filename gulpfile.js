@@ -34,7 +34,7 @@ gulp.task('test', ['build:src', 'build:test'], () => {
         });
 });
 
-gulp.task('dev', ['build:src', 'build:test', 'test'], () => {
-    gulp.watch('src/*.js', ['build', 'test']);
+gulp.task('dev', ['test'], () => {
+    gulp.watch(['src/modules/*.js', 'src/microducks.js'], ['test']);
     gulp.watch('test/*.js', ['test']);
 });

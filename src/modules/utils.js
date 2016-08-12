@@ -27,11 +27,9 @@ const Utils = {
 
         toClear.forEach((name) => {
             clearFunc(name, previous[name]);
-            delete previous[name];
         });
         toSet.forEach((name) => {
             setFunc(name, next[name], previous[name]);
-            previous[name] = next[name];
         });
     }
 };

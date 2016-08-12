@@ -3,13 +3,20 @@
 function mount(originId, f, props = {}) {
     let origin = document.getElementById(originId);
 
-    function mergeAttributes(element, view) {
-        Utils.merge(element.$$coreducks.attrs, view.attrs,
-              Element.prototype.setAttribute.bind(element), Element.prototype.removeAttribute.bind(element));
+    function mergeProps(element, view) {
+        element.$$view.props = element.$$view.props || {};
+        Utils.merge(element.$$view.props, view.props,
+                    (name, next, prev) => {
+                        element[name] = next;
+                    },
+                    (name, next, prev) => {
+                        element[name] = null;
+                    });
     }
 
     function mergeListeners(element, view) {
-        Utils.merge(element.$$coreducks.listeners, view.listeners,
+        element.$$view.listeners = element.$$view.listeners || {};
+        Utils.merge(element.$$view.listeners, view.listeners,
                     (name, next, prev) => {
                         element.removeEventListener(name, prev);
                         element.addEventListener(name, next);
@@ -20,7 +27,7 @@ function mount(originId, f, props = {}) {
     function mergeBody(element, view) {
         if (element.childNodes.length < view.body.length) {
             for (let i = element.childNodes.length; i < view.body.length; i++) {
-                element.appendChild(createNode(view.body[i]));
+                element.appendChild(view.body[i].node());
             }
         } else if (element.childNodes.length > view.body.length) {
             let toRemove = [];
@@ -39,23 +46,30 @@ function mount(originId, f, props = {}) {
         // create new element if old doesn't match
         function mergeTag() {
             if (element.nodeType !== Node.ELEMENT_NODE || element.nodeName.toLowerCase() !== view.name.toLowerCase()) {
-                let newElement = createNode(view);
+                let newElement = view.node();
                 element.parentNode.replaceChild(newElement, element);
                 element = newElement;
             }
 
-            mergeAttributes(element, view);
-            mergeListeners(element, view);
-            mergeBody(element, view);
+            if (element.$$view !== view) {
+                mergeProps(element, view);
+                mergeListeners(element, view);
+                mergeBody(element, view);
+
+                element.$$view = view;
+            }
+
             return element;
         }
 
         function mergeText() {
             if (element.nodeType !== Node.TEXT_NODE || element.wholeText !== view.text) {
-                let newElement = createNode(view);
+                let newElement = view.node();
                 element.parentNode.replaceChild(newElement, element);
                 element = newElement;
             }
+
+            element.$$view = view;
             return element;
         }
 
@@ -69,7 +83,7 @@ function mount(originId, f, props = {}) {
         }
     }
 
-    addMetadata(origin);
+    origin.$$view = {};
     origin = mergeWithDOM(origin, f(props));
     return () => {
         origin = mergeWithDOM(origin, f(props));
