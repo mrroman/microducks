@@ -4,6 +4,7 @@ import * as MicroDucks from 'microducks';
 import {el, text} from 'microducks';
 
 const store = MicroDucks.Store.create({
+    filterName: 'all',
     taskName: '',
     nextId: 1,
     tasks: []
@@ -21,30 +22,61 @@ const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
 });
 
 const todoItem = (item) => {
+    const checkItem = (e) => {
+        store.dispatch('check-item', item.id);
+    };
+
+    const remove = (e) => {
+        store.dispatch('remove-item', item.id);
+    };
+
     return el('li')
         .prop('className', item.done ? 'completed' : '')
-        .body(el('div').prop('className', 'view')
-              .body(el('input').prop('className', 'toggle').prop('type', 'checkbox').prop('checked', item.done).on('change', (e) => { store.dispatch("check-item", item.id);}),
+        .body(el('div')
+              .prop('className', 'view')
+              .body(el('input')
+                    .prop('className', 'toggle')
+                    .prop('type', 'checkbox')
+                    .prop('checked', item.done)
+                    .on('change', checkItem),
                     el('label').body(text(item.text)),
-                    el('button').prop('className', 'destroy').on('click', (e) => store.dispatch("remove-item", item.id))));
+                    el('button').prop('className', 'destroy').on('click', remove)));
 };
 
-const todoFilter = (type) => {
-    return el('li').body(el('a').prop('className', 'selected').body(text(type)));
+const todoFilter = (type, name, selected) => {
+    return el('li')
+        .body(el('a')
+              .prop('className', selected ? 'selected' : '')
+              .on('click', (e) => store.dispatch('set-filter', name))
+              .body(text(type)));
 };
 
-const todoFooter = MicroDucks.Utils.cache((tasks) => {
-    return el('footer').prop('className', 'footer')
-        .body(el('span').prop('className', 'todo-count')
-              .body(el('strong').body(text(tasks.length)),
+const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
+    let todoCount = tasks.filter((task) => !task.done).length;
+
+    return el('footer')
+        .prop('className', 'footer')
+        .body(el('span')
+              .prop('className', 'todo-count')
+              .body(el('strong')
+                    .body(text(todoCount)),
                     text(' left')),
-              el('ul').prop('className', 'filters')
-              .body(todoFilter('All'), todoFilter('Active'), todoFilter('Completed')));
+              el('ul')
+              .prop('className', 'filters')
+              .body(todoFilter('All', 'all', (filterName === 'all')),
+                    todoFilter('Active', 'active', (filterName === 'active')),
+                    todoFilter('Completed', 'completed', (filterName === 'completed'))),
+              (tasks.length - todoCount > 0) &&
+              el('button')
+                    .prop('className', 'clear-completed')
+                    .on('click', (e) => store.dispatch('clear-completed'))
+              .body(text('Clear completed')));
 });
 
 const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
     if (tasks.length) {
-        return el('section').prop('className', 'main')
+        return el('section')
+            .prop('className', 'main')
             .body(el('ul')
                   .prop('className', 'todo-list')
                   .body(...tasks.map(todoItem)));
@@ -57,10 +89,20 @@ const todos = MicroDucks.mount('todoapp', (props) => {
     return el('div')
         .body(el('header')
               .prop('className', 'header')
-              .body(el('h1').body(text('todos')),
+              .body(el('h1')
+                    .body(text('todos')),
                     todoAdd(props.taskName)),
-              todoList(props.tasks),
-              todoFooter(props.tasks));
+              todoList(props.tasks.filter((task) => {
+                  switch(props.filterName) {
+                  case 'active':
+                      return !task.done;
+                  case 'completed':
+                      return !!task.done;
+                  default:
+                      return true;
+                  }
+              })),
+              todoFooter(props.tasks, props.filterName));
 }, store.data);
 
 store.handle('add-item', function (data) {
@@ -69,6 +111,11 @@ store.handle('add-item', function (data) {
         data.taskName = '';
         data.nextId++;
     }
+    return data;
+});
+
+store.handle('set-filter', function(data, filterName) {
+    data.filterName = filterName;
     return data;
 });
 
@@ -95,7 +142,12 @@ store.handle('check-item', function(data, itemId) {
         }
     });
     return data;
-})
+});
+
+store.handle('clear-completed', function(data) {
+    data.tasks = data.tasks.filter((task) => !task.done);
+    return data;
+});
 
 store.subscribe(function(data) {
     todos(data);

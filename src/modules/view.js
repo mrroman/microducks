@@ -24,7 +24,7 @@ El.prototype = {
         return element;
     },
     body(...views) {
-        this.body = views;
+        this.body = views.filter((x) => x);
         return this;
     }
 };
