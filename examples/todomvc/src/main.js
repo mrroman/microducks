@@ -3,12 +3,60 @@ import 'todomvc-common/base.css';
 import * as MicroDucks from 'microducks';
 import {el, text} from 'microducks';
 
+// application logic
+
 const store = MicroDucks.Store.create({
     filterName: 'all',
     taskName: '',
     nextId: 1,
     tasks: []
 });
+
+store.handle('add-item', function (data) {
+    if (data.taskName !== '') {
+        data.tasks= [{id: data.nextId, text: data.taskName, done: false}, ...data.tasks];
+        data.taskName = '';
+        data.nextId++;
+    }
+    return data;
+});
+
+store.handle('set-filter', function(data, filterName) {
+    data.filterName = filterName;
+    return data;
+});
+
+store.handle('remove-item', function(data, itemId) {
+    data.tasks = data.tasks.filter((item) => (item.id !== itemId));
+    return data;
+});
+
+store.handle('update-task-name', function(data, taskName) {
+    data.taskName = taskName;
+    return data;
+});
+
+store.handle('check-item', function(data, itemId) {
+    data.tasks = data.tasks.map((item) => {
+        if (item.id === itemId) {
+            return {
+                id: item.id,
+                text: item.text,
+                done: !item.done
+            };
+        } else {
+            return item;
+        }
+    });
+    return data;
+});
+
+store.handle('clear-completed', function(data) {
+    data.tasks = data.tasks.filter((task) => !task.done);
+    return data;
+});
+
+// application view
 
 const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
     return el('input')
@@ -105,49 +153,6 @@ const todos = MicroDucks.mount('todoapp', (props) => {
               todoFooter(props.tasks, props.filterName));
 }, store.data);
 
-store.handle('add-item', function (data) {
-    if (data.taskName !== '') {
-        data.tasks= [{id: data.nextId, text: data.taskName, done: false}, ...data.tasks];
-        data.taskName = '';
-        data.nextId++;
-    }
-    return data;
-});
-
-store.handle('set-filter', function(data, filterName) {
-    data.filterName = filterName;
-    return data;
-});
-
-store.handle('remove-item', function(data, itemId) {
-    data.tasks = data.tasks.filter((item) => (item.id !== itemId));
-    return data;
-});
-
-store.handle('update-task-name', function(data, taskName) {
-    data.taskName = taskName;
-    return data;
-});
-
-store.handle('check-item', function(data, itemId) {
-    data.tasks = data.tasks.map((item) => {
-        if (item.id === itemId) {
-            return {
-                id: item.id,
-                text: item.text,
-                done: !item.done
-            };
-        } else {
-            return item;
-        }
-    });
-    return data;
-});
-
-store.handle('clear-completed', function(data) {
-    data.tasks = data.tasks.filter((task) => !task.done);
-    return data;
-});
 
 store.subscribe(function(data) {
     todos(data);
