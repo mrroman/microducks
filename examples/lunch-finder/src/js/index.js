@@ -29,10 +29,10 @@ const clickHandler = () => {
 // ----------------------------------------------------------------------------
 const buttonElement = () => {
     return el('section')
-        .attr('class', 'box container')
+        .prop('className', 'box container')
         .body(
             el('button')
-            .attr('class', 'button button--sacnite')
+            .prop('className', 'button button--sacnite')
             .body(text('Get another place'))
             .on('click', clickHandler)
         );
@@ -40,42 +40,43 @@ const buttonElement = () => {
 
 const placeElement = MicroDucks.Utils.cache((item) => {
     return el('section')
-        .attr('class', 'feed clearfix')
+        .prop('className', 'feed clearfix')
         .body(
             el('h2')
-            .attr('class', 'feed__title')
+            .prop('className', 'feed__title')
             .body(
                 el('a')
-                .attr('href', item.websiteUrl)
+                .prop('href', item.websiteUrl)
                 .body(text(item.name))
                 ),
             el('img')
-            .attr('class', 'feed__image')
-            .attr('src', item.imageUrl)
+            .prop('className', 'feed__image')
+            .prop('src', item.imageUrl)
             .body(),
             el('p')
-            .attr('class', 'feed_description')
+            .prop('className', 'feed_description')
             .body(text(item.description))
         );
 });
 
-
-// Mount
-// ----------------------------------------------------------------------------
-const app = MicroDucks.mount('js-app', (props) => {
+const lunchFinder = (data) => {
     return el('div')
-        .attr('class', 'container')
+        .prop('className', 'container')
         .body(
             buttonElement(),
-            placeElement(props.place)
+            placeElement(data.place)
         );
-}, store.data);
+};
 
+// Merger
+// ----------------------------------------------------------------------------
+const app = MicroDucks.VDOM.createMerger('js-app');
+app(lunchFinder(store.data));
 
 // Store
 // ----------------------------------------------------------------------------
 store.subscribe((data) => {
-    app(data);
+    app(lunchFinder(data));
 });
 
 store.handle('new-place', (data, newPlace) => {
