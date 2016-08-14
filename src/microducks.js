@@ -1,5 +1,5 @@
 export {
-    mount,
+    VDOM,
     el,
     text,
     Store,

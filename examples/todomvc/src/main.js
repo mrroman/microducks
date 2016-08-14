@@ -133,15 +133,15 @@ const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
     }
 });
 
-const todos = MicroDucks.mount('todoapp', (props) => {
+const todos = (data) => {
     return el('div')
         .body(el('header')
               .prop('className', 'header')
               .body(el('h1')
                     .body(text('todos')),
-                    todoAdd(props.taskName)),
-              todoList(props.tasks.filter((task) => {
-                  switch(props.filterName) {
+                    todoAdd(data.taskName)),
+              todoList(data.tasks.filter((task) => {
+                  switch(data.filterName) {
                   case 'active':
                       return !task.done;
                   case 'completed':
@@ -150,10 +150,12 @@ const todos = MicroDucks.mount('todoapp', (props) => {
                       return true;
                   }
               })),
-              todoFooter(props.tasks, props.filterName));
-}, store.data);
+              todoFooter(data.tasks, data.filterName));
+};
 
+const todoMerger = MicroDucks.VDOM.createMerger('todoapp');
+todoMerger(todos(store.data));
 
 store.subscribe(function(data) {
-    todos(data);
+    todoMerger(todos(data));
 });
