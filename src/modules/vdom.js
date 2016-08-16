@@ -35,7 +35,17 @@ const VDOM = {
                 for (let i = view.body.length; i < element.childNodes.length; i++) {
                     toRemove.push(element.childNodes.item(i));
                 }
-                toRemove.forEach((node) => element.removeChild(node));
+                toRemove.forEach((node) => {
+                    console.log('remove childnodes', node);
+                    if (node.$$view) {
+                        console.log('removing listeners');
+                        Object.keys(node.$$view.listeners).forEach((name) => {
+                            console.log('remove listener', name);
+                            node.removeEventListener(name, node.$$view.listeners[node]);
+                        });
+                    }
+                    node.parentNode.removeChild(node);
+                });
             }
 
             for (var i = 0; i < view.body.length; i++) {

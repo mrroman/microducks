@@ -36,13 +36,14 @@ store.handle('update-task-name', function(data, taskName) {
     return data;
 });
 
-store.handle('check-item', function(data, itemId) {
+store.handle('update-item', function(data, taskId, props) {
     data.tasks = data.tasks.map((item) => {
-        if (item.id === itemId) {
+        if (item.id === taskId) {
             return {
                 id: item.id,
-                text: item.text,
-                done: !item.done
+                text: props.text === undefined ? item.text : props.text,
+                done: props.done === undefined ? item.done : props.done,
+                edit: props.edit === undefined ? item.edit : props.edit
             };
         } else {
             return item;
@@ -71,24 +72,57 @@ const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
 
 const todoItem = (item) => {
     const checkItem = (e) => {
-        store.dispatch('check-item', item.id);
+        store.dispatch('update-item', item.id, {done: !item.done});
     };
 
     const remove = (e) => {
         store.dispatch('remove-item', item.id);
     };
 
-    return el('li')
-        .prop('className', item.done ? 'completed' : '')
-        .body(el('div')
-              .prop('className', 'view')
-              .body(el('input')
-                    .prop('className', 'toggle')
-                    .prop('type', 'checkbox')
-                    .prop('checked', item.done)
-                    .on('change', checkItem),
-                    el('label').body(text(item.text)),
-                    el('button').prop('className', 'destroy').on('click', remove)));
+    const startEditItem = (e) => {
+        store.dispatch('update-item', item.id, {edit:true});
+    };
+
+    const cancelEditItem = (e) => {
+        store.dispatch('update-item', item.id, {edit:false});
+    };
+
+    const updateItem = (e) => {
+        store.dispatch('update-item', item.id, {edit:false, text: e.target.value});
+    };
+
+    if (!item.edit) {
+        return el('li')
+            .prop('className', item.done ? 'completed' : '')
+            .body(el('div')
+                  .prop('className', 'view')
+                  .body(el('input')
+                        .prop('className', 'toggle')
+                        .prop('type', 'checkbox')
+                        .prop('checked', item.done)
+                        .on('change', checkItem),
+                        el('label').body(text(item.text)).on('dblclick', startEditItem),
+                        el('button').prop('className', 'destroy').on('click', remove)
+                       ));
+    } else {
+        return el('li')
+            .prop('className', 'editing')
+            .body(el('div')
+                  .prop('className', 'view')
+                  .body(el('input')
+                        .prop('className', 'toggle')
+                        .prop('type', 'checkbox')
+                        .prop('checked', item.done)
+                        .on('change', checkItem),
+                        el('label').body(text(item.text)).on('dblclick', startEditItem),
+                        el('button').prop('className', 'destroy').on('click', remove)),
+                  el('input')
+                  .prop('className', 'edit')
+                  .prop('type', 'text')
+                  .prop('value', item.text)
+                  .on('change', updateItem)
+                  .on('blur', cancelEditItem));
+    }
 };
 
 const todoFilter = (type, name, selected) => {
