@@ -10,7 +10,7 @@ gulp.task('build:js', () => {
 });
 
 gulp.task('watch', () => {
-    gulp.watch('src/*.js', ['build:js']);
+    gulp.watch(['src/*.js', '../../dist/microducks.js'], ['build:js']);
 });
 
 gulp.task('serve', () => {
@@ -20,4 +20,4 @@ gulp.task('serve', () => {
     });
 });
 
-gulp.task('default', ['build:js', 'serve', 'watch']);
+gulp.task('dev', ['build:js', 'serve', 'watch']);

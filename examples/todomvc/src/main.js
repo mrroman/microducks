@@ -120,6 +120,7 @@ const todoItem = (item) => {
                   .prop('className', 'edit')
                   .prop('type', 'text')
                   .prop('value', item.text)
+                  .focus()
                   .on('change', updateItem)
                   .on('blur', cancelEditItem));
     }

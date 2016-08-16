@@ -23,6 +23,10 @@ El.prototype = {
         element.$$view = {};
         return element;
     },
+    focus() {
+        this.focused = true;
+        return this;
+    },
     body(...views) {
         this.body = views.filter((x) => x);
         return this;

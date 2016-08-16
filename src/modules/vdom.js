@@ -36,15 +36,10 @@ const VDOM = {
                     toRemove.push(element.childNodes.item(i));
                 }
                 toRemove.forEach((node) => {
-                    console.log('remove childnodes', node);
-                    if (node.$$view) {
-                        console.log('removing listeners');
-                        Object.keys(node.$$view.listeners).forEach((name) => {
-                            console.log('remove listener', name);
-                            node.removeEventListener(name, node.$$view.listeners[node]);
-                        });
+                    if (node.$$view && !node.$$view.detached) {
+                        node.$$view.detached = true;
+                        node.parentNode.removeChild(node);
                     }
-                    node.parentNode.removeChild(node);
                 });
             }
 
@@ -66,6 +61,9 @@ const VDOM = {
                     mergeProps(element, view);
                     mergeListeners(element, view);
                     mergeBody(element, view);
+                    if (view.focused) {
+                        element.focus();
+                    }
 
                     element.$$view = view;
                 }
