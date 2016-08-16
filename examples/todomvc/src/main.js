@@ -84,6 +84,7 @@ const todoItem = (item) => {
     };
 
     const cancelEditItem = (e) => {
+        e.target.value = item.text;
         store.dispatch('update-item', item.id, {edit:false});
     };
 
@@ -108,20 +109,18 @@ const todoItem = (item) => {
         return el('li')
             .prop('className', 'editing')
             .body(el('div')
-                  .prop('className', 'view')
-                  .body(el('input')
-                        .prop('className', 'toggle')
-                        .prop('type', 'checkbox')
-                        .prop('checked', item.done)
-                        .on('change', checkItem),
-                        el('label').body(text(item.text)).on('dblclick', startEditItem),
-                        el('button').prop('className', 'destroy').on('click', remove)),
+                  .prop('className', 'view'),
                   el('input')
                   .prop('className', 'edit')
                   .prop('type', 'text')
                   .prop('value', item.text)
                   .focus()
                   .on('change', updateItem)
+                  .on('keydown', (e) => {
+                      if (e.keyCode == 27) {
+                          cancelEditItem(e);
+                      }
+                  })
                   .on('blur', cancelEditItem));
     }
 };
