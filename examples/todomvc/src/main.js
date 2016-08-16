@@ -12,7 +12,7 @@ const store = MicroDucks.Store.create({
     tasks: []
 });
 
-store.handle('add-item', function (data) {
+const AddTask = store.event('add-task').handle((data) => {
     if (data.taskName !== '') {
         data.tasks= [{id: data.nextId, text: data.taskName, done: false}, ...data.tasks];
         data.taskName = '';
@@ -21,38 +21,38 @@ store.handle('add-item', function (data) {
     return data;
 });
 
-store.handle('set-filter', function(data, filterName) {
-    data.filterName = filterName;
-    return data;
-});
-
-store.handle('remove-item', function(data, itemId) {
-    data.tasks = data.tasks.filter((item) => (item.id !== itemId));
-    return data;
-});
-
-store.handle('update-task-name', function(data, taskName) {
-    data.taskName = taskName;
-    return data;
-});
-
-store.handle('update-item', function(data, taskId, props) {
-    data.tasks = data.tasks.map((item) => {
-        if (item.id === taskId) {
+const UpdateTask = store.event('update-task').handle((data, taskId, props) => {
+    data.tasks = data.tasks.map((task) => {
+        if (task.id === taskId) {
             return {
-                id: item.id,
-                text: props.text === undefined ? item.text : props.text,
-                done: props.done === undefined ? item.done : props.done,
-                edit: props.edit === undefined ? item.edit : props.edit
+                id: task.id,
+                text: props.text === undefined ? task.text : props.text,
+                done: props.done === undefined ? task.done : props.done,
+                edit: props.edit === undefined ? task.edit : props.edit
             };
         } else {
-            return item;
+            return task;
         }
     });
     return data;
 });
 
-store.handle('clear-completed', function(data) {
+const RemoveTask = store.event('remove-task').handle((data, taskId) => {
+    data.tasks = data.tasks.filter((task) => (task.id !== taskId));
+    return data;
+});
+
+const SetFilter = store.event('set-filter').handle((data, filterName) => {
+    data.filterName = filterName;
+    return data;
+});
+
+const UpdateTaskName = store.event('update-task-name').handle((data, taskName) => {
+    data.taskName = taskName;
+    return data;
+});
+
+const ClearCompleted = store.event('clear-completed').handle((data) => {
     data.tasks = data.tasks.filter((task) => !task.done);
     return data;
 });
@@ -66,44 +66,32 @@ const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
         .prop('autofocus', 'true')
         .prop('type', 'text')
         .prop('value', taskName)
-        .on('input', (e) => store.dispatch("update-task-name", e.target.value))
-        .on('change', (e) => store.dispatch('add-item'));
+        .on('input', (e) => UpdateTaskName(e.target.value)())
+        .on('change', AddTask());
 });
 
-const todoItem = (item) => {
-    const checkItem = (e) => {
-        store.dispatch('update-item', item.id, {done: !item.done});
+const todoTask = (task) => {
+    const cancelEditTask = (e) => {
+        e.target.value = task.text;
+        UpdateTask(task.id, {edit:false})();
     };
 
-    const remove = (e) => {
-        store.dispatch('remove-item', item.id);
-    };
-
-    const startEditItem = (e) => {
-        store.dispatch('update-item', item.id, {edit:true});
-    };
-
-    const cancelEditItem = (e) => {
-        e.target.value = item.text;
-        store.dispatch('update-item', item.id, {edit:false});
-    };
-
-    const updateItem = (e) => {
-        store.dispatch('update-item', item.id, {edit:false, text: e.target.value});
-    };
-
-    if (!item.edit) {
+    if (!task.edit) {
         return el('li')
-            .prop('className', item.done ? 'completed' : '')
+            .prop('className', task.done ? 'completed' : '')
             .body(el('div')
                   .prop('className', 'view')
                   .body(el('input')
                         .prop('className', 'toggle')
                         .prop('type', 'checkbox')
-                        .prop('checked', item.done)
-                        .on('change', checkItem),
-                        el('label').body(text(item.text)).on('dblclick', startEditItem),
-                        el('button').prop('className', 'destroy').on('click', remove)
+                        .prop('checked', task.done)
+                        .on('change', UpdateTask(task.id, {done: !task.done})),
+                        el('label')
+                        .body(text(task.text))
+                        .on('dblclick', UpdateTask(task.id, {edit:true})),
+                        el('button')
+                        .prop('className', 'destroy')
+                        .on('click', RemoveTask(task.id))
                        ));
     } else {
         return el('li')
@@ -113,15 +101,15 @@ const todoItem = (item) => {
                   el('input')
                   .prop('className', 'edit')
                   .prop('type', 'text')
-                  .prop('value', item.text)
+                  .prop('value', task.text)
                   .focus()
-                  .on('change', updateItem)
+                  .on('change', (e) => UpdateTask(task.id, {edit:false, text: e.target.value})())
                   .on('keydown', (e) => {
                       if (e.keyCode == 27) {
-                          cancelEditItem(e);
+                          cancelEditTask(e);
                       }
                   })
-                  .on('blur', cancelEditItem));
+                  .on('blur', cancelEditTask));
     }
 };
 
@@ -129,7 +117,7 @@ const todoFilter = (type, name, selected) => {
     return el('li')
         .body(el('a')
               .prop('className', selected ? 'selected' : '')
-              .on('click', (e) => store.dispatch('set-filter', name))
+              .on('click', SetFilter(name))
               .body(text(type)));
 };
 
@@ -150,8 +138,8 @@ const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
                     todoFilter('Completed', 'completed', (filterName === 'completed'))),
               (tasks.length - todoCount > 0) &&
               el('button')
-                    .prop('className', 'clear-completed')
-                    .on('click', (e) => store.dispatch('clear-completed'))
+              .prop('className', 'clear-completed')
+              .on('click', ClearCompleted())
               .body(text('Clear completed')));
 });
 
@@ -161,7 +149,7 @@ const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
             .prop('className', 'main')
             .body(el('ul')
                   .prop('className', 'todo-list')
-                  .body(...tasks.map(todoItem)));
+                  .body(...tasks.map(todoTask)));
     } else {
         return el('div');
     }
