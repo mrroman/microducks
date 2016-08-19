@@ -11,10 +11,16 @@ function El(name) {
 
 El.prototype = {
     prop(name, value) {
+        if (this.props[name]) {
+            console.warn(`Property ${name} has been duplicated.`);
+        }
         this.props[name] = value;
         return this;
     },
     on(event, listener) {
+        if (this.listeners[event]) {
+            console.warn(`Listener on event ${event} has been duplicated.`);
+        }
         this.listeners[event] = listener;
         return this;
     },

@@ -11,9 +11,7 @@ const Store = {
         };
 
         ev.subscribe = (handler) => {
-            ev.addEventListener('$$updated', (e) => {
-                handler(e.target.data);
-            });
+            ev.addEventListener('$$updated', (e) => handler(e.target.data));
         };
 
         ev.dispatch = (eventType, ...args) => {
