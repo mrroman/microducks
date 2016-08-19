@@ -2,23 +2,22 @@ import Q from 'q';
 
 import config from './config';
 
+const parseData = (item) => {
+    if (!item || !item.attachments) {
+        return {};
+    }
+
+    item = item.attachments[0];
+
+    return {
+        name: item.title,
+        description: item.text,
+        imageUrl: item.thumb_url,
+        websiteUrl: item.title_link
+    };
+};
 
 export default {
-    parseData(item) {
-        if (!item || !item.attachments) {
-            return {};
-        }
-
-        item = item.attachments[0];
-
-        return {
-            name: item.title,
-            description: item.text,
-            imageUrl: item.thumb_url,
-            websiteUrl: item.title_link
-        };
-    },
-
     getRandomPlace() {
         const url = `${config.apiHost}/random`;
 
@@ -29,7 +28,7 @@ export default {
         request.onload = () => {
             if (request.status >= 200 && request.status < 400) {
                 const data = JSON.parse(request.responseText);
-                const parsedData = this.parseData(data);
+                const parsedData = parseData(data);
 
                 deferred.resolve(parsedData);
             } else {
@@ -37,9 +36,8 @@ export default {
             }
         };
 
-        request.onerror = (reason) => {
+        request.onerror = (reason) =>
             deferred.reject('There was a connection error', reason);
-        };
 
         request.send();
 
