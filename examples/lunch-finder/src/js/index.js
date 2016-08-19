@@ -15,12 +15,8 @@ const store = MicroDucks.Store.create({
 
 const clickHandler = () => {
     lunchFinderService.getRandomPlace().then(
-        (data) => {
-            store.dispatch('new-place', data);
-        },
-        (reason) => {
-            return new Error(reason);
-        }
+        (data) => store.dispatch('new-place', data),
+        (reason) => new Error(reason)
     );
 };
 
