@@ -18,6 +18,12 @@ El.prototype = {
         this.props[name] = value;
         return this;
     },
+    propIf(condition, name, value) {
+        if (condition) {
+            this.prop(name, value);
+        }
+        return this;
+    },
     on(event, listener) {
         if (this.listeners[event]) {
             console.warn(`Listener on event ${event} has been duplicated.`);
@@ -35,7 +41,13 @@ El.prototype = {
         return this;
     },
     has(...views) {
-        this.body = this.body.concat(views.filter((x) => x));
+        Array.prototype.push.apply(this.body, views);
+        return this;
+    },
+    hasIf(condition, ...views) {
+        if (condition) {
+            this.has(...views);
+        }
         return this;
     }
 };
@@ -54,6 +66,10 @@ Text.prototype = {
 };
 
 const el = (name, txt) => {
-    return new El(name).has(typeof txt === 'string' && new Text(txt));
+    if (typeof txt === 'string') {
+        return new El(name).has(new Text(txt));
+    } else {
+        return new El(name);
+    }
 };
 const text = (s) => new Text(s);

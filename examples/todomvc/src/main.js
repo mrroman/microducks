@@ -94,7 +94,7 @@ const todoItem = (item) => {
 
     if (!item.edit) {
         return el('li')
-            .prop('className', item.done ? 'completed' : '')
+            .propIf(item.done, 'className', 'completed')
             .has(el('div')
                   .prop('className', 'view')
                   .has(el('input')
@@ -128,31 +128,37 @@ const todoItem = (item) => {
 const todoFilter = (type, name, selected) => {
     return el('li')
         .has(el('a')
-              .prop('className', selected ? 'selected' : '')
-              .on('click', (e) => store.dispatch('set-filter', name))
-              .has(text(type)));
+             .propIf(selected, 'className', 'selected')
+             .on('click', (e) => store.dispatch('set-filter', name))
+             .has(text(type)));
 };
 
 const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
     let todoCount = tasks.filter((task) => !task.done).length;
 
-    return el('footer')
+    let filterButtons = el('ul')
+        .prop('className', 'filters')
+        .has(todoFilter('All', 'all', (filterName === 'all')),
+             todoFilter('Active', 'active', (filterName === 'active')),
+             todoFilter('Completed', 'completed', (filterName === 'completed')));
+
+    let counter = el('span')
+        .prop('className', 'todo-count')
+        .has(el('strong')
+             .has(text(todoCount)),
+             text(' left'));
+
+    let clearCompleted = el('button')
+        .prop('className', 'clear-completed')
+        .on('click', (e) => store.dispatch('clear-completed'))
+        .has(text('Clear completed'));
+
+    let footer = el('footer')
         .prop('className', 'footer')
-        .has(el('span')
-              .prop('className', 'todo-count')
-              .has(el('strong')
-                    .has(text(todoCount)),
-                    text(' left')),
-              el('ul')
-              .prop('className', 'filters')
-              .has(todoFilter('All', 'all', (filterName === 'all')),
-                    todoFilter('Active', 'active', (filterName === 'active')),
-                    todoFilter('Completed', 'completed', (filterName === 'completed'))),
-              (tasks.length - todoCount > 0) &&
-              el('button')
-                    .prop('className', 'clear-completed')
-                    .on('click', (e) => store.dispatch('clear-completed'))
-              .has(text('Clear completed')));
+        .has(counter, filterButtons)
+        .hasIf(tasks.length - todoCount > 0, clearCompleted);
+
+    return footer;
 });
 
 const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
