@@ -7,12 +7,8 @@ const VDOM = {
         function mergeProps(element, view) {
             element.$$view.props = element.$$view.props || {};
             Utils.merge(element.$$view.props, view.props,
-                        (name, next, prev) => {
-                            element[name] = next;
-                        },
-                        (name, next, prev) => {
-                            element[name] = null;
-                        });
+                        (name, next, prev) => element[name] = next,
+                        (name, next, prev) => element[name] = null);
         }
 
         function mergeListeners(element, view) {
@@ -43,7 +39,7 @@ const VDOM = {
                 });
             }
 
-            for (var i = 0; i < view.body.length; i++) {
+            for (let i = 0; i < view.body.length; i++) {
                 mergeWithDOM(element.childNodes.item(i), view.body[i]);
             }
         }
