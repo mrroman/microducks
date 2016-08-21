@@ -1,0 +1,16 @@
+{
+    "!name": "mocha",
+    "!doc": "https://mochajs.org/",
+    "it": {
+        "!type": "fn(description: string, inside: fn(done: fn()))"
+    },
+    "describe": {
+        "!type": "fn(description: string, inside: fn(done: fn()))"
+    },
+    "beforeEach": {
+        "!type": "fn(inside: fn(done: fn()))"
+    },
+    "afterEach": {
+        "!type": "fn(inside: fn(done: fn()))"
+    }
+}

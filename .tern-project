@@ -1,6 +1,8 @@
 {
   "libs": [
-    "browser"
+    "browser",
+    "chai",
+    "test/mocha"
   ],
   "plugins": {
     "es_modules": {}
