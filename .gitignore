@@ -1,7 +1,7 @@
 dist/
+build/
 npm-debug.log*
 node_modules
-test-build
 examples/*/public/js
 .tern-port
 *.sublime*

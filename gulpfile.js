@@ -22,7 +22,7 @@ gulp.task('build:src', ['clean:dist'], () => {
 gulp.task('build:test', ['clean:test'], () => {
     return gulp.src('test/*.js')
         .pipe(babel())
-        .pipe(gulp.dest('test-build'));
+        .pipe(gulp.dest('build/test'));
 });
 
 gulp.task('test', ['build:src', 'build:test'], () => {
