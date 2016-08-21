@@ -93,8 +93,12 @@ const VDOM = {
         }
 
         origin.$$view = {};
-        return (view) => {
+
+        let fn = (view) => {
             origin = mergeWithDOM(origin, view);
+            fn.origin = origin;
         };
+
+        return fn;
     }
 };
