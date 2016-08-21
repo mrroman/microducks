@@ -7,6 +7,7 @@ function El(name) {
     this.name = name;
     this.props = {};
     this.listeners = {};
+    this.body = [];
 }
 
 El.prototype = {
@@ -33,8 +34,8 @@ El.prototype = {
         this.focused = true;
         return this;
     },
-    body(...views) {
-        this.body = views.filter((x) => x);
+    has(...views) {
+        this.body = this.body.concat(views.filter((x) => x));
         return this;
     }
 };
@@ -52,5 +53,7 @@ Text.prototype = {
     }
 };
 
-const el = (name) => new El(name);
+const el = (name, txt) => {
+    return new El(name).has(typeof txt === 'string' && new Text(txt));
+};
 const text = (s) => new Text(s);

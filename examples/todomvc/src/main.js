@@ -95,20 +95,20 @@ const todoItem = (item) => {
     if (!item.edit) {
         return el('li')
             .prop('className', item.done ? 'completed' : '')
-            .body(el('div')
+            .has(el('div')
                   .prop('className', 'view')
-                  .body(el('input')
+                  .has(el('input')
                         .prop('className', 'toggle')
                         .prop('type', 'checkbox')
                         .prop('checked', item.done)
                         .on('change', checkItem),
-                        el('label').body(text(item.text)).on('dblclick', startEditItem),
+                        el('label').has(text(item.text)).on('dblclick', startEditItem),
                         el('button').prop('className', 'destroy').on('click', remove)
                        ));
     } else {
         return el('li')
             .prop('className', 'editing')
-            .body(el('div')
+            .has(el('div')
                   .prop('className', 'view'),
                   el('input')
                   .prop('className', 'edit')
@@ -127,10 +127,10 @@ const todoItem = (item) => {
 
 const todoFilter = (type, name, selected) => {
     return el('li')
-        .body(el('a')
+        .has(el('a')
               .prop('className', selected ? 'selected' : '')
               .on('click', (e) => store.dispatch('set-filter', name))
-              .body(text(type)));
+              .has(text(type)));
 };
 
 const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
@@ -138,30 +138,30 @@ const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
 
     return el('footer')
         .prop('className', 'footer')
-        .body(el('span')
+        .has(el('span')
               .prop('className', 'todo-count')
-              .body(el('strong')
-                    .body(text(todoCount)),
+              .has(el('strong')
+                    .has(text(todoCount)),
                     text(' left')),
               el('ul')
               .prop('className', 'filters')
-              .body(todoFilter('All', 'all', (filterName === 'all')),
+              .has(todoFilter('All', 'all', (filterName === 'all')),
                     todoFilter('Active', 'active', (filterName === 'active')),
                     todoFilter('Completed', 'completed', (filterName === 'completed'))),
               (tasks.length - todoCount > 0) &&
               el('button')
                     .prop('className', 'clear-completed')
                     .on('click', (e) => store.dispatch('clear-completed'))
-              .body(text('Clear completed')));
+              .has(text('Clear completed')));
 });
 
 const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
     if (tasks.length) {
         return el('section')
             .prop('className', 'main')
-            .body(el('ul')
+            .has(el('ul')
                   .prop('className', 'todo-list')
-                  .body(...tasks.map(todoItem)));
+                  .has(...tasks.map(todoItem)));
     } else {
         return el('div');
     }
@@ -169,10 +169,10 @@ const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
 
 const todos = (data) => {
     return el('div')
-        .body(el('header')
+        .has(el('header')
               .prop('className', 'header')
-              .body(el('h1')
-                    .body(text('todos')),
+              .has(el('h1')
+                    .has(text('todos')),
                     todoAdd(data.taskName)),
               todoList(data.tasks.filter((task) => {
                   switch(data.filterName) {

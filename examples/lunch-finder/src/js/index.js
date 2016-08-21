@@ -26,10 +26,10 @@ const clickHandler = () => {
 const buttonElement = () => {
     return el('section')
         .prop('className', 'box container')
-        .body(
+        .has(
             el('button')
             .prop('className', 'button button--sacnite')
-            .body(text('Get another place'))
+            .has(text('Get another place'))
             .on('click', clickHandler)
         );
 };
@@ -37,28 +37,28 @@ const buttonElement = () => {
 const placeElement = MicroDucks.Utils.cache((item) => {
     return el('section')
         .prop('className', 'feed clearfix')
-        .body(
+        .has(
             el('h2')
             .prop('className', 'feed__title')
-            .body(
+            .has(
                 el('a')
                 .prop('href', item.websiteUrl)
-                .body(text(item.name))
+                .has(text(item.name))
                 ),
             el('img')
             .prop('className', 'feed__image')
             .prop('src', item.imageUrl)
-            .body(),
+            .has(),
             el('p')
             .prop('className', 'feed_description')
-            .body(text(item.description))
+            .has(text(item.description))
         );
 });
 
 const lunchFinder = (data) => {
     return el('div')
         .prop('className', 'container')
-        .body(
+        .has(
             buttonElement(),
             placeElement(data.place)
         );

@@ -14,7 +14,7 @@ describe('vdom', function() {
 
     it('merge simple view with static text', () => {
         let merger = VDOM.createMerger('root');
-        let simpleView = el('div').body(text('text'));
+        let simpleView = el('div', 'text');
 
         merger(simpleView);
 
@@ -24,7 +24,7 @@ describe('vdom', function() {
 
     it('merge simple view with two nested elements', () => {
         let merger = VDOM.createMerger('root');
-        let simpleView = el('div').body(el('span'), el('span'));
+        let simpleView = el('div').has(el('span'), el('span'));
 
         merger(simpleView);
 
@@ -53,7 +53,7 @@ describe('vdom', function() {
 
     it('merge simple view with nested element with property', () => {
         let merger = VDOM.createMerger('root');
-        let simpleView = el('div').body(el('span').prop('className', 'blue'));
+        let simpleView = el('div').has(el('span').prop('className', 'blue'));
 
         merger(simpleView);
 
@@ -63,7 +63,7 @@ describe('vdom', function() {
     it('merge simple view with nested element with listener', () => {
         let merger = VDOM.createMerger('root');
         let check = false;
-        let simpleView = el('div').body(el('span')
+        let simpleView = el('div').has(el('span')
                                         .prop('id', 'click')
                                         .on('click', () => { check = true; }));
 
@@ -75,8 +75,8 @@ describe('vdom', function() {
 
     it('merge simple view and overwrite it with other simple view', () => {
         let merger = VDOM.createMerger('root');
-        let simpleView = el('div').body(text('aaa'));
-        let differentView = el('ul').body(el('li'), el('li'));
+        let simpleView = el('div', 'aaa');
+        let differentView = el('ul').has(el('li'), el('li'));
 
         merger(simpleView);
         merger(differentView);
@@ -89,8 +89,8 @@ describe('vdom', function() {
 
     it('merge simple view and overwrite it keeping nodes', () => {
         let merger = VDOM.createMerger('root');
-        let simpleView = el('div').body(el('span').body(text('aaa')));
-        let differentView = el('div').body(el('span').body(text('bbb')));
+        let simpleView = el('div').has(el('span', 'aaa'));
+        let differentView = el('div').has(el('span', 'bbb'));
 
         merger(simpleView);
         let spanNode = merger.origin.childNodes[0];
@@ -101,8 +101,8 @@ describe('vdom', function() {
 
     it('merge simple view and overwrite it keeping nodes', () => {
         let merger = VDOM.createMerger('root');
-        let simpleView = el('div').body(el('span').body(text('aaa')));
-        let differentView = el('div').body(el('span').body(text('bbb')));
+        let simpleView = el('div').has(el('span', 'aaa'));
+        let differentView = el('div').has(el('span', 'bbb'));
 
         merger(simpleView);
         let spanNode = merger.origin.childNodes[0];
