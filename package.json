@@ -18,12 +18,15 @@
     "gulp-mocha-phantomjs": "0.11.0",
     "gulp-util": "3.0.7",
     "mocha": "2.5.3",
-    "sinon": "1.17.4"
+    "sinon": "1.17.4",
+    "uglify-js": "2.7.3"
   },
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp build",
-    "test": "gulp test"
+    "test": "gulp test",
+    "dist": "npm run test && npm run dist:uglify",
+    "dist:uglify": "cd dist && uglifyjs -c -m --source-map microducks.min.js.map -o microducks.min.js microducks.js"
   },
   "repository": {
     "type": "git",
