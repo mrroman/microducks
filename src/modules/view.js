@@ -3,7 +3,7 @@ function View(type) {
 }
 
 function El(name) {
-    View.call(this, 'tag');
+    View.call(this, 'element');
     this.name = name;
     this.props = {};
     this.listeners = {};
@@ -31,11 +31,6 @@ El.prototype = {
         this.listeners[event] = listener;
         return this;
     },
-    node() {
-        const element = document.createElement(this.name);
-        element.$$view = {};
-        return element;
-    },
     focus() {
         this.focused = true;
         return this;
@@ -56,14 +51,6 @@ function Text(s) {
     View.call(this, 'text');
     this.text = s;
 }
-
-Text.prototype = {
-    node() {
-        let element = document.createTextNode(this.text);
-        element.$$view = {};
-        return element;
-    }
-};
 
 const el = (name, txt) => {
     if (typeof txt === 'string') {

@@ -6,7 +6,7 @@ describe('view', () => {
     it('create element is empty', () => {
         let v = el('div');
 
-        assert.equal(v.type, 'tag');
+        assert.equal(v.type, 'element');
         assert.equal(v.name, 'div');
         assert.equal(Object.keys(v.listeners).length, 0, 'empty listeners');
         assert.equal(Object.keys(v.props).length, 0, 'empty props');
@@ -16,7 +16,7 @@ describe('view', () => {
     it('create element with static text', () => {
         let v = el('div', 'hello');
 
-        assert.equal(v.type, 'tag');
+        assert.equal(v.type, 'element');
         assert.equal(v.name, 'div');
         assert.equal(Object.keys(v.listeners).length, 0, 'empty listeners');
         assert.equal(Object.keys(v.props).length, 0, 'empty props');
@@ -27,7 +27,7 @@ describe('view', () => {
     it('create element with child views', () => {
         let v = el('div').has(el('span'), el('span'));
 
-        assert.equal(v.type, 'tag');
+        assert.equal(v.type, 'element');
         assert.equal(v.name, 'div');
         assert.equal(v.body.length, 2);
         assert.equal(v.body[0].name, 'span');
