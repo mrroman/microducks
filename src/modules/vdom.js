@@ -3,30 +3,42 @@
 
 const createViewMerger = (viewMergerProto) => {
     if (typeof viewMergerProto.merge !== 'function' ||
-        typeof viewMergerProto.createNode !== 'function') {
-        throw new Error('View merger has to implement createNode and merge functions');
+        typeof viewMergerProto.create !== 'function') {
+        throw new Error('View merger has to implement create and merge functions');
     }
 
     return Object.create(viewMergerProto);
 };
 
 const TextViewMerger = createViewMerger({
-    merge(element, view) {
-        if (element.nodeType !== Node.TEXT_NODE || element.wholeText !== view.text) {
-            let newElement = this.createNode(view);
-            element.parentNode.replaceChild(newElement, element);
-            element = newElement;
-        }
+    createNeeded(element, view) {
+        return (element.nodeType !== Node.TEXT_NODE || element.wholeText !== view.text);
+    },
+    create(view) {
+        return document.createTextNode(view.text);
+    },
 
-        element.$$view = view;
+    merge(element) {
         return element;
     },
-    createNode(view) {
-        return document.createTextNode(view.text);
+    mergeNeeded(element, view) {
+        return false;
     }
 });
 
 const ElementViewMerger = createViewMerger({
+    createNeeded(element, view) {
+        return (element.nodeType !== Node.ELEMENT_NODE || element.nodeName.toLowerCase() !== view.name.toLowerCase());
+    },
+    create(view) {
+        let node = document.createElement(view.name);
+        node.$$view = {};
+        return node;
+    },
+
+    mergeNeeded(element, view) {
+        return (element.$$view !== view);
+    },
     merge(element, view) {
         function mergeProps(element, view) {
             element.$$view.props = element.$$view.props || {};
@@ -45,28 +57,13 @@ const ElementViewMerger = createViewMerger({
                         Element.prototype.removeEventListener.bind(element));
         }
 
-        if (element.nodeType !== Node.ELEMENT_NODE || element.nodeName.toLowerCase() !== view.name.toLowerCase()) {
-            let newElement = this.createNode(view);
-            element.parentNode.replaceChild(newElement, element);
-            element = newElement;
+        mergeProps(element, view);
+        mergeListeners(element, view);
+        if (view.focused) {
+            element.focus();
         }
 
-        if (element.$$view !== view) {
-            mergeProps(element, view);
-            mergeListeners(element, view);
-            if (view.focused) {
-                element.focus();
-            }
-
-            element.$$view = view;
-        }
-
-        return element;
-    },
-    createNode(view) {
-        let node = document.createElement(view.name);
-        node.$$view = {};
-        return node;
+        element.$$view = view;
     }
 });
 
@@ -80,13 +77,12 @@ const VDOM = {
         let origin = document.getElementById(originId);
 
         function mergeBody(element, view) {
-            if (element.childNodes.length < view.body.length) {
-                for (let i = element.childNodes.length; i < view.body.length; i++) {
-                    element.appendChild(mergers[view.type].createNode(view.body[i]));
-                }
-            } else if (element.childNodes.length > view.body.length) {
+            let elementChildrenCnt = element.childNodes.length,
+                viewBodyItemCnt = view.body.length;
+
+            if (elementChildrenCnt > viewBodyItemCnt) {
                 let toRemove = [];
-                for (let i = view.body.length; i < element.childNodes.length; i++) {
+                for (let i = viewBodyItemCnt; i < elementChildrenCnt; i++) {
                     toRemove.push(element.childNodes.item(i));
                 }
                 toRemove.forEach((node) => {
@@ -95,24 +91,39 @@ const VDOM = {
                         node.parentNode.removeChild(node);
                     }
                 });
+                elementChildrenCnt = viewBodyItemCnt;
             }
 
-            for (let i = 0; i < view.body.length; i++) {
+            for (let i = 0; i < elementChildrenCnt; i++) {
                 mergeWithDOM(element.childNodes.item(i), view.body[i]);
+            }
+            for (let i = elementChildrenCnt; i < viewBodyItemCnt; i++) {
+                element.appendChild(mergeWithDOM(null, view.body[i]));
             }
         }
 
         function mergeWithDOM(element, view) {
             // create new element if old doesn't match
-            if (DefaultMergers[view.type]) {
-                let elementView = element.$$view,
-                    mergedElement = DefaultMergers[view.type].merge(element, view);
+            if (mergers[view.type]) {
+                let merger = mergers[view.type];
 
-                if (view.body && elementView !== view) {
-                    mergeBody(mergedElement, view);
+                if (element === null || merger.createNeeded(element, view)) {
+                    let newElement = merger.create(view);
+                    if (element !== null) {
+                        element.parentElement.replaceChild(newElement, element);
+                    }
+                    element = newElement;
                 }
 
-                return mergedElement;
+                if (merger.mergeNeeded(element, view)) {
+                    merger.merge(element, view);
+
+                    if (view.body) {
+                        mergeBody(element, view);
+                    }
+                }
+
+                return element;
             } else {
                 return element;
             }
