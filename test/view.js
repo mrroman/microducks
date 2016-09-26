@@ -1,10 +1,10 @@
 import sinon from 'sinon';
-import {VDOM, el, text} from '../dist/microducks.js';
+import {Views} from '../dist/microducks.js';
 import {assert} from 'chai';
 
 describe('view', () => {
     it('create element is empty', () => {
-        let v = el('div');
+        let v = Views.el('div');
 
         assert.equal(v.type, 'element');
         assert.equal(v.name, 'div');
@@ -14,7 +14,7 @@ describe('view', () => {
     });
 
     it('create element with static text', () => {
-        let v = el('div', 'hello');
+        let v = Views.el('div', 'hello');
 
         assert.equal(v.type, 'element');
         assert.equal(v.name, 'div');
@@ -25,7 +25,7 @@ describe('view', () => {
     });
 
     it('create element with child views', () => {
-        let v = el('div').has(el('span'), el('span'));
+        let v = Views.el('div').has(Views.el('span'), Views.el('span'));
 
         assert.equal(v.type, 'element');
         assert.equal(v.name, 'div');
@@ -35,16 +35,16 @@ describe('view', () => {
     });
 
     it('append to element if true', () => {
-        let v1 = el('div').hasIf(true, el('span'));
-        let v2 = el('div').hasIf(false, el('span'));
+        let v1 = Views.el('div').hasIf(true, Views.el('span'));
+        let v2 = Views.el('div').hasIf(false, Views.el('span'));
 
         assert.equal(v1.body.length, 1);
         assert.equal(v2.body.length, 0);
     });
 
     it('set prop to element if true', () => {
-        let v1 = el('div').propIf(true, 'className', 'show');
-        let v2 = el('div').propIf(false, 'className', 'show');
+        let v1 = Views.el('div').propIf(true, 'className', 'show');
+        let v2 = Views.el('div').propIf(false, 'className', 'show');
 
         assert.equal(v1.props.className, 'show');
         assert.isDefined(v1.props['className']);

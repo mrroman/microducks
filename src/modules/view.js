@@ -52,11 +52,26 @@ function Text(s) {
     this.text = s;
 }
 
-const el = (name, txt) => {
-    if (typeof txt === 'string') {
-        return new El(name).has(new Text(txt));
-    } else {
-        return new El(name);
+function Input(type) {
+    El.call(this, 'input');
+    this.type = 'input';
+    this.props.type = type;
+}
+
+Input.prototype = Object.create(El.prototype);
+
+const Views = {
+    el(name, txt) {
+        if (typeof txt === 'string') {
+            return new El(name).has(new Text(txt));
+        } else {
+            return new El(name);
+        }
+    },
+    text(s) {
+        return new Text(s);
+    },
+    input(type) {
+        return new Input(type);
     }
 };
-const text = (s) => new Text(s);
