@@ -1,6 +1,6 @@
 export {
+    DOM,
     Store,
     Utils,
-    VDOM,
     Views
 };

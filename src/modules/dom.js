@@ -1,7 +1,6 @@
-// virtual dom
 /* global Utils : false */
 
-class ViewMerger {
+class ViewUpdate {
     createNeeded(element, view) {
         return false;
     }
@@ -22,7 +21,7 @@ class ViewMerger {
     }
 }
 
-class TextViewMerger extends ViewMerger {
+class TextViewUpdate extends ViewUpdate {
     createNeeded(element, view) {
         return (element.nodeType !== Node.TEXT_NODE || element.wholeText !== view.text);
     }
@@ -40,7 +39,7 @@ class TextViewMerger extends ViewMerger {
     }
 }
 
-class ElementViewMerger extends ViewMerger {
+class ElementViewUpdate extends ViewUpdate {
     createNeeded(element, view) {
         return (element.nodeType !== Node.ELEMENT_NODE || element.nodeName.toLowerCase() !== view.name.toLowerCase());
     }
@@ -83,7 +82,7 @@ class ElementViewMerger extends ViewMerger {
     }
 }
 
-class InputViewMerger extends ElementViewMerger {
+class InputViewUpdate extends ElementViewUpdate {
     mergeProps(element, view) {
         let {selectionStart, selectionEnd, selectionDirection} = element,
             valueChanged = element.$$view.props && element.$$view.props.value !== view.props.value;
@@ -96,14 +95,15 @@ class InputViewMerger extends ElementViewMerger {
     }
 }
 
-const DefaultViewMergers = {
-    'text': new TextViewMerger(),
-    'element': new ElementViewMerger(),
-    'input': new InputViewMerger()
+const DefaultViewUpdates = {
+    'text': new TextViewUpdate(),
+    'element': new ElementViewUpdate(),
+    'input': new InputViewUpdate()
 };
 
-const VDOM = {
-    createMerger(originId, mergers = DefaultViewMergers) {
+const DOM = {
+
+    update(originId, view, mergers = DefaultViewUpdates) {
         let origin = document.getElementById(originId);
 
         function mergeBody(element, view) {
@@ -136,9 +136,9 @@ const VDOM = {
             if (mergers[view.type]) {
                 let merger = mergers[view.type];
 
-                if (element === null || merger.createNeeded(element, view)) {
+                if (!element || merger.createNeeded(element, view)) {
                     let newElement = merger.create(view);
-                    if (element !== null) {
+                    if (element) {
                         parentElement.replaceChild(newElement, element);
                     } else {
                         parentElement.appendChild(newElement);
@@ -162,17 +162,10 @@ const VDOM = {
             }
         }
 
-        origin.$$view = {};
-
-        let fn = (view) => {
-            origin = mergeWithDOM(origin.parentElement, origin, view);
-            fn.origin = origin;
-        };
-
-        return fn;
+        return mergeWithDOM(origin, origin.childNodes[0], view);
     },
 
-    ViewMerger,
-    ElementViewMerger,
+    ViewUpdate,
+    mergers: DefaultViewUpdates
 
 };
