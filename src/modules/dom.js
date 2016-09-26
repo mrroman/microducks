@@ -1,6 +1,6 @@
 /* global Utils : false */
 
-class ViewUpdate {
+class DOMUpdate {
     createNeeded(element, view) {
         return false;
     }
@@ -21,7 +21,7 @@ class ViewUpdate {
     }
 }
 
-class TextViewUpdate extends ViewUpdate {
+class TextViewDOMUpdate extends DOMUpdate {
     createNeeded(element, view) {
         return (element.nodeType !== Node.TEXT_NODE || element.wholeText !== view.text);
     }
@@ -39,7 +39,7 @@ class TextViewUpdate extends ViewUpdate {
     }
 }
 
-class ElementViewUpdate extends ViewUpdate {
+class ElementViewDOMUpdate extends DOMUpdate {
     createNeeded(element, view) {
         return (element.nodeType !== Node.ELEMENT_NODE || element.nodeName.toLowerCase() !== view.name.toLowerCase());
     }
@@ -82,7 +82,7 @@ class ElementViewUpdate extends ViewUpdate {
     }
 }
 
-class InputViewUpdate extends ElementViewUpdate {
+class InputViewDOMUpdate extends ElementViewDOMUpdate {
     mergeProps(element, view) {
         let {selectionStart, selectionEnd, selectionDirection} = element,
             valueChanged = element.$$view.props && element.$$view.props.value !== view.props.value;
@@ -95,15 +95,15 @@ class InputViewUpdate extends ElementViewUpdate {
     }
 }
 
-const DefaultViewUpdates = {
-    'text': new TextViewUpdate(),
-    'element': new ElementViewUpdate(),
-    'input': new InputViewUpdate()
+const DefaultDOMUpdates = {
+    'text': new TextViewDOMUpdate(),
+    'element': new ElementViewDOMUpdate(),
+    'input': new InputViewDOMUpdate()
 };
 
 const DOM = {
 
-    update(originId, view, mergers = DefaultViewUpdates) {
+    update(originId, view, updates = DefaultDOMUpdates) {
         let origin = document.getElementById(originId);
 
         function mergeBody(element, view) {
@@ -133,23 +133,23 @@ const DOM = {
         }
 
         function mergeWithDOM(parentElement, element, view) {
-            if (mergers[view.type]) {
-                let merger = mergers[view.type];
+            if (updates[view.type]) {
+                let update = updates[view.type];
 
-                if (!element || merger.createNeeded(element, view)) {
-                    let newElement = merger.create(view);
+                if (!element || update.createNeeded(element, view)) {
+                    let newElement = update.create(view);
                     if (element) {
                         parentElement.replaceChild(newElement, element);
                     } else {
                         parentElement.appendChild(newElement);
                     }
 
-                    merger.attached(newElement, view);
+                    update.attached(newElement, view);
                     element = newElement;
                 }
 
-                if (merger.mergeNeeded(element, view)) {
-                    merger.merge(element, view);
+                if (update.mergeNeeded(element, view)) {
+                    update.merge(element, view);
 
                     if (view.body) {
                         mergeBody(element, view);
@@ -165,7 +165,7 @@ const DOM = {
         return mergeWithDOM(origin, origin.childNodes[0], view);
     },
 
-    ViewUpdate,
-    mergers: DefaultViewUpdates
+    DOMUpdate,
+    updates: DefaultDOMUpdates
 
 };
