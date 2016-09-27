@@ -1,7 +1,7 @@
 import 'todomvc-app-css/index.css';
 import 'todomvc-common/base.css';
 import * as MicroDucks from 'microducks';
-import {el, text} from 'microducks';
+import {Views as V} from 'microducks';
 
 // application logic
 
@@ -60,11 +60,10 @@ store.handle('clear-completed', function(data) {
 // application view
 
 const todoAdd = MicroDucks.Utils.cache(function todoAdd(taskName) {
-    return el('input')
+    return V.input('text')
         .prop('className', 'new-todo')
         .prop('placeholder', 'What needs to be done?')
         .prop('autofocus', 'true')
-        .prop('type', 'text')
         .prop('value', taskName)
         .on('input', (e) => store.dispatch("update-task-name", e.target.value))
         .on('change', (e) => store.dispatch('add-item'));
@@ -93,67 +92,62 @@ const todoItem = (item) => {
     };
 
     if (!item.edit) {
-        return el('li')
+        return V.el('li')
             .propIf(item.done, 'className', 'completed')
-            .has(el('div')
-                  .prop('className', 'view')
-                  .has(el('input')
-                        .prop('className', 'toggle')
-                        .prop('type', 'checkbox')
-                        .prop('checked', item.done)
-                        .on('change', checkItem),
-                        el('label').has(text(item.text)).on('dblclick', startEditItem),
-                        el('button').prop('className', 'destroy').on('click', remove)
-                       ));
+            .has(V.el('div')
+                 .prop('className', 'view')
+                 .has(V.input('checkbox')
+                      .prop('className', 'toggle')
+                      .prop('checked', item.done)
+                      .on('change', checkItem),
+                      V.el('label', item.text).on('dblclick', startEditItem),
+                      V.el('button').prop('className', 'destroy').on('click', remove)
+                     ));
     } else {
-        return el('li')
+        return V.el('li')
             .prop('className', 'editing')
-            .has(el('div')
-                  .prop('className', 'view'),
-                  el('input')
-                  .prop('className', 'edit')
-                  .prop('type', 'text')
-                  .prop('value', item.text)
-                  .focus()
-                  .on('change', updateItem)
-                  .on('keydown', (e) => {
-                      if (e.keyCode == 27) {
-                          cancelEditItem(e);
-                      }
-                  })
-                  .on('blur', cancelEditItem));
+            .has(V.el('div')
+                 .prop('className', 'view'),
+                 V.input('text')
+                 .prop('className', 'edit')
+                 .prop('value', item.text)
+                 .focus()
+                 .on('change', updateItem)
+                 .on('keydown', (e) => {
+                     if (e.keyCode === 27) {
+                         cancelEditItem(e);
+                     }
+                 })
+                 .on('blur', cancelEditItem));
     }
 };
 
 const todoFilter = (type, name, selected) => {
-    return el('li')
-        .has(el('a')
+    return V.el('li')
+        .has(V.el('a', type)
              .propIf(selected, 'className', 'selected')
-             .on('click', (e) => store.dispatch('set-filter', name))
-             .has(text(type)));
+             .on('click', (e) => store.dispatch('set-filter', name)));
 };
 
 const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
     let todoCount = tasks.filter((task) => !task.done).length;
 
-    let filterButtons = el('ul')
+    let filterButtons = V.el('ul')
         .prop('className', 'filters')
         .has(todoFilter('All', 'all', (filterName === 'all')),
              todoFilter('Active', 'active', (filterName === 'active')),
              todoFilter('Completed', 'completed', (filterName === 'completed')));
 
-    let counter = el('span')
+    let counter = V.el('span')
         .prop('className', 'todo-count')
-        .has(el('strong')
-             .has(text(todoCount)),
-             text(' left'));
+        .has(V.el('strong', '' + todoCount),
+             V.text(' left'));
 
-    let clearCompleted = el('button')
+    let clearCompleted = V.el('button', 'Clear completed')
         .prop('className', 'clear-completed')
-        .on('click', (e) => store.dispatch('clear-completed'))
-        .has(text('Clear completed'));
+        .on('click', (e) => store.dispatch('clear-completed'));
 
-    let footer = el('footer')
+    let footer = V.el('footer')
         .prop('className', 'footer')
         .has(counter, filterButtons)
         .hasIf(tasks.length - todoCount > 0, clearCompleted);
@@ -163,39 +157,37 @@ const todoFooter = MicroDucks.Utils.cache((tasks, filterName) => {
 
 const todoList = MicroDucks.Utils.cache(function todoList(tasks) {
     if (tasks.length) {
-        return el('section')
+        return V.el('section')
             .prop('className', 'main')
-            .has(el('ul')
-                  .prop('className', 'todo-list')
-                  .has(...tasks.map(todoItem)));
+            .has(V.el('ul')
+                 .prop('className', 'todo-list')
+                 .has(...tasks.map(todoItem)));
     } else {
-        return el('div');
+        return V.el('div');
     }
 });
 
 const todos = (data) => {
-    return el('div')
-        .has(el('header')
-              .prop('className', 'header')
-              .has(el('h1')
-                    .has(text('todos')),
-                    todoAdd(data.taskName)),
-              todoList(data.tasks.filter((task) => {
-                  switch(data.filterName) {
-                  case 'active':
-                      return !task.done;
-                  case 'completed':
-                      return !!task.done;
-                  default:
-                      return true;
-                  }
-              })),
-              todoFooter(data.tasks, data.filterName));
+    return V.el('div')
+        .has(V.el('header')
+             .prop('className', 'header')
+             .has(V.el('h1', 'todos'),
+                  todoAdd(data.taskName)),
+             todoList(data.tasks.filter((task) => {
+                 switch(data.filterName) {
+                 case 'active':
+                     return !task.done;
+                 case 'completed':
+                     return !!task.done;
+                 default:
+                     return true;
+                 }
+             })),
+             todoFooter(data.tasks, data.filterName));
 };
 
-const todoMerger = MicroDucks.VDOM.createMerger('todoapp');
-todoMerger(todos(store.data));
+MicroDucks.DOM.update('todoapp', todos(store.data));
 
 store.subscribe(function(data) {
-    todoMerger(todos(data));
+    MicroDucks.DOM.update('todoapp', todos(store.data));
 });

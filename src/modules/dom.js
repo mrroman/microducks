@@ -84,13 +84,17 @@ class ElementViewDOMUpdate extends DOMUpdate {
 
 class InputViewDOMUpdate extends ElementViewDOMUpdate {
     mergeProps(element, view) {
-        let {selectionStart, selectionEnd, selectionDirection} = element,
-            valueChanged = element.$$view.props && element.$$view.props.value !== view.props.value;
+        if (view.props.type === 'text') {
+            let {selectionStart, selectionEnd, selectionDirection} = element,
+                valueChanged = element.$$view.props && element.$$view.props.value !== view.props.value;
 
-        super.mergeProps(element, view);
+            super.mergeProps(element, view);
 
-        if (valueChanged) {
-            element.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
+            if (valueChanged) {
+                element.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
+            }
+        } else {
+            super.mergeProps(element, view);
         }
     }
 }
